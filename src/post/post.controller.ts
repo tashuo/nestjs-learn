@@ -8,18 +8,24 @@ import {
     Delete,
     Req,
     ParseArrayPipe,
+    Inject,
+    HttpException,
+    InternalServerErrorException,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Controller('post')
 export class PostController {
     constructor(
         private readonly postService: PostService,
         @InjectQueue('default') private queue: Queue,
+        @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
     ) {}
 
     @Post()
@@ -45,7 +51,12 @@ export class PostController {
 
     @Get(':id')
     async findOne(@Param('id') id: string) {
+        throw new InternalServerErrorException('test error');
         await this.queue.add({ job: `id-${id}` });
+        this.logger.debug('debug test');
+        this.logger.info('info test');
+        this.logger.warn('warn test');
+        this.logger.error('errortest');
         return this.postService.findOne(+id);
     }
 
