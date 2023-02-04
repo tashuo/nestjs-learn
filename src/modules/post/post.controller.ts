@@ -9,7 +9,6 @@ import {
     Req,
     ParseArrayPipe,
     Inject,
-    HttpException,
     InternalServerErrorException,
 } from '@nestjs/common';
 import { PostService } from './post.service';

@@ -3,10 +3,9 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { User } from './entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthService } from 'src/auth/auth.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { AuthModule } from 'src/auth/auth.module';
-import { jwtConstants } from 'src/auth/constants';
+import { AuthService } from '../auth/auth.service';
+import { jwtConstants } from 'src/constants/jwt';
 
 @Module({
     providers: [UserService, AuthService],
