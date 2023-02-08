@@ -81,20 +81,20 @@
     "containerId": "",
     "name": "127.0.0.1:3000/post",
     "url": "127.0.0.1:3000/post",
-    "method": "GET",
+    "method": "POST",
     "sortNum": 0,
     "created": "2022-12-17T13:53:17.126Z",
-    "modified": "2022-12-17T13:53:17.126Z",
+    "modified": "2023-02-04T14:28:17.692Z",
     "headers": [
       {
         "name": "Authorization",
-        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoxLCJpYXQiOjE2NzEyNzE0MTIsImV4cCI6MTY3MTM1NzgxMn0.rDSpR7XEA54-d_hz-J0t7oYTyMvrnJN3AilJXYkcFkM"
+        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoxLCJpYXQiOjE2NzU1MTgzNzIsImV4cCI6MTY3NTYwNDc3Mn0.OENlYZqeRtu49h2paXgdJIsC60aOrcuMpT5DeJg_UVE"
       }
     ],
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"123456\"\n}",
+      "raw": "{\n  \"title\": \"cdcdcdcd\",\n  \"content\": \"efgsddsa\",\n  \"content_type\": \"text\"\n}",
       "form": []
     },
     "tests": []
@@ -121,6 +121,25 @@
       "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"123456\"\n}",
       "form": []
     },
+    "tests": []
+  },
+  {
+    "_id": "b7872a61-c2fb-4365-8092-893e5e5dc10f",
+    "colId": "history",
+    "containerId": "",
+    "name": "127.0.0.1:3000/post",
+    "url": "127.0.0.1:3000/post",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2023-02-04T14:27:49.827Z",
+    "modified": "2023-02-04T14:27:49.827Z",
+    "headers": [
+      {
+        "name": "Authorization",
+        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoxLCJpYXQiOjE2NzU1MTgzNzIsImV4cCI6MTY3NTYwNDc3Mn0.OENlYZqeRtu49h2paXgdJIsC60aOrcuMpT5DeJg_UVE"
+      }
+    ],
+    "params": [],
     "tests": []
   }
 ]

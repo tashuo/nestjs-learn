@@ -18,6 +18,7 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import { User } from 'src/common/decorators/user.decorator';
 
 @Controller('post')
 export class PostController {
@@ -28,8 +29,8 @@ export class PostController {
     ) {}
 
     @Post()
-    create(@Req() req, @Body() createPostDto: CreatePostDto) {
-        return this.postService.create(createPostDto, req.user.id);
+    create(@User() user, @Body() createPostDto: CreatePostDto) {
+        return this.postService.create(createPostDto, user.id);
     }
 
     // TypeScript 不存储泛型或接口的元数据，因此当你在 DTO 中使用它们的时候， ValidationPipe 可能不能正确验证输入数据
