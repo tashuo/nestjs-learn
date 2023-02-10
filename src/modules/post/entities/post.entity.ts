@@ -1,11 +1,18 @@
+import { User } from '../../user/entities/user.entity';
 import {
     BaseEntity,
     Column,
     CreateDateColumn,
     Entity,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
+    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+import { PostExtra } from './post_extra.entity';
+import { Tag as TagEntity } from './tag.entity';
 
 export enum ContentType {
     HTML = 'html',
@@ -23,8 +30,12 @@ export class Post extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    user_id: number;
+    @ManyToOne(() => User, (user) => user.posts, {
+        nullable: false,
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+    })
+    user: User;
 
     @Column()
     title: string;
@@ -51,4 +62,11 @@ export class Post extends BaseEntity {
 
     @UpdateDateColumn()
     updated_at: Date;
+
+    @ManyToMany(() => TagEntity)
+    @JoinTable()
+    tags?: TagEntity[];
+
+    @OneToOne(() => PostExtra, (extra) => extra.post)
+    extra: PostExtra;
 }

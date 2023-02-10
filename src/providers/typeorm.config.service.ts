@@ -8,13 +8,9 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
 
     createTypeOrmOptions(): TypeOrmModuleOptions {
         return {
-            type: 'mysql',
-            host: this.config.get('database.host'),
-            port: this.config.get('database.port'),
-            username: this.config.get('database.username'),
-            database: this.config.get('database.database'),
+            ...this.config.get('database'),
             entities: [],
-            synchronize: true,
+            synchronize: false,
             autoLoadEntities: true,
         };
     }

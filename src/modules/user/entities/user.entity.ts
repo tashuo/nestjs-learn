@@ -1,8 +1,10 @@
+import { Post } from '../../post/entities/post.entity';
 import {
     BaseEntity,
     Column,
     CreateDateColumn,
     Entity,
+    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -17,6 +19,9 @@ export class User extends BaseEntity {
     })
     username: string;
 
+    @Column()
+    nickname: string;
+
     @Column({
         type: 'char',
         length: 32,
@@ -28,4 +33,7 @@ export class User extends BaseEntity {
 
     @UpdateDateColumn()
     updated_at: Date;
+
+    @OneToMany(() => Post, (post) => post.user)
+    posts!: Post[];
 }
