@@ -26,47 +26,53 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+phper从零开始学习typescript&&nestjs框架记录
+
 ## Installation
 
 ```bash
-$ npm install
+$ pnpm i
+
+$ pnpm typeorm:run-migrations # run migrations
 ```
 
 ## Running the app
 
 ```bash
-# development
-$ npm run start
-
 # watch mode
-$ npm run start:dev
+$ pnpm start:dev
+
+# debug mode
+$ pnpm start:debug
 
 # production mode
-$ npm run start:prod
+$ pnpm run start:prod
 ```
 
 ## Test
 
 ```bash
 # unit tests
-$ npm run test
+$ pnpm test
 
 # e2e tests
-$ npm run test:e2e
+$ pnpm test:e2e
 
 # test coverage
-$ npm run test:cov
+$ pnpm test:cov
 ```
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Features
+- [x] 配置文件
+- [x] 日志系统
+- [x] 异常捕获Filter
+- [x] 自定义装饰器
+- [x] jwt鉴权
+- [x] 异步队列
+- [x] typeorm(migrate&&relations)
+- [ ] crud组件
+- [ ] 单元测试
+- [ ] 其他
 
 ## License
 
