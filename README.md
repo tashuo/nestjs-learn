@@ -23,10 +23,7 @@
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-phper从零开始学习typescript&&nestjs框架记录
+phper从零开始学习`typescript` && `nestjs` 框架全记录
 
 ## Installation
 
