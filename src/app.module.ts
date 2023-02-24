@@ -5,9 +5,10 @@ import { DefaultConsumer } from './jobs/default.consumer';
 import { HttpException2Filter } from './common/filters/http.exception2.filter';
 import { HttpExceptionFilter } from './common/filters/http.exception.filter';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { TagModule } from './modules/tag/tag.module';
 
 @Module({
-    imports: [BootstrapModule],
+    imports: [BootstrapModule, TagModule],
     providers: [
         DefaultConsumer, // 注册后才会消费
         {

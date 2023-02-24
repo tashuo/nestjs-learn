@@ -21,9 +21,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const status = exception.getStatus();
         this.logger.error(exception.stack);
         response.status(status).json({
-            statusCode: status,
+            code: status,
             timestamp: new Date().toISOString(),
-            path: request.url,
+            message: 'something goes wrong~',
         });
     }
 }

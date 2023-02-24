@@ -9,6 +9,7 @@ import { PostModule } from './modules/post/post.module';
 import { UserModule } from './modules/user/user.module';
 import { TypeOrmConfigService } from './providers/typeorm.config.service';
 import * as winston from 'winston';
+import { TagModule } from './modules/tag/tag.module';
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import * as winston from 'winston';
         PostModule,
         CommentModule,
         UserModule,
+        TagModule,
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
             useClass: TypeOrmConfigService, // 同useFactory,useClass不需要inject

@@ -1,0 +1,2 @@
+export const RESPONSE_CODE_SUCCESS = 200;
+export const RESPONSE_CODE_FAILED = 500;

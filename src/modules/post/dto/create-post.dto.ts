@@ -1,5 +1,5 @@
 import { ContentType } from '../entities/post.entity';
-import { IsNotEmpty, Length } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, Length } from 'class-validator';
 
 export class CreatePostDto {
     @Length(1, 20)
@@ -10,4 +10,8 @@ export class CreatePostDto {
 
     @IsNotEmpty()
     readonly content_type: ContentType;
+
+    @IsArray()
+    @IsOptional()
+    readonly tags: string[];
 }

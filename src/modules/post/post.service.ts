@@ -1,25 +1,35 @@
 import { Injectable } from '@nestjs/common';
+import { In } from 'typeorm';
+import { Tag } from '../tag/entities/tag.entity';
+import { User } from '../user/entities/user.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
+import { PostRepository } from './post.repository';
 
 @Injectable()
 export class PostService {
-    async create(createPostDto: CreatePostDto, user_id: number) {
-        const post = new Post();
-        post.title = createPostDto.title;
-        post.content = createPostDto.content;
-        post.content_type = createPostDto.content_type;
-        post.user_id = user_id;
-        await post.save();
+    constructor(private readonly postRepository: PostRepository) {}
+
+    async create({ tags, ...data }: CreatePostDto, user: User) {
+        let postTags = [];
+        if (tags) {
+            postTags = await Tag.find({ where: { id: In(tags) } });
+        }
+        const post = await Post.save({
+            ...data,
+            user: user,
+            tags: postTags,
+        } as any);
+        return await Post.findOne({ where: { id: post.id }, relations: ['user', 'tags'] });
     }
 
     findAll() {
-        return Post.find();
+        return Post.find({ relations: ['user', 'tags'] });
     }
 
     findOne(id: number) {
-        return Post.findBy({ id: id });
+        return Post.findOne({ where: { id: id }, relations: ['user', 'tags'] });
     }
 
     async update(id: number, updatePostDto: UpdatePostDto) {

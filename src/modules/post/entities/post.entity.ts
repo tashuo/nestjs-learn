@@ -4,6 +4,7 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    Index,
     JoinTable,
     ManyToMany,
     ManyToOne,
@@ -12,7 +13,8 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { PostExtra } from './post_extra.entity';
-import { Tag as TagEntity } from './tag.entity';
+import { Tag as TagEntity } from '../../tag/entities/tag.entity';
+import { Exclude, Expose } from 'class-transformer';
 
 export enum ContentType {
     HTML = 'html',
@@ -30,11 +32,13 @@ export class Post extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Expose()
     @ManyToOne(() => User, (user) => user.posts, {
         nullable: false,
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
     })
+    @Index()
     user: User;
 
     @Column()
@@ -50,6 +54,7 @@ export class Post extends BaseEntity {
     })
     content_type: ContentType;
 
+    @Exclude()
     @Column({
         type: 'enum',
         enum: STATUS,
@@ -60,6 +65,7 @@ export class Post extends BaseEntity {
     @CreateDateColumn()
     created_at: Date;
 
+    @Exclude()
     @UpdateDateColumn()
     updated_at: Date;
 

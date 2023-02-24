@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { ConfigService } from 'nestjs-config';
+import { resolve } from 'path';
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -9,7 +10,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
     createTypeOrmOptions(): TypeOrmModuleOptions {
         return {
             ...this.config.get('database'),
-            entities: [],
+            entities: [resolve(__dirname, '../modules/**/entities/*.{js,ts}')], // 引入entity
             synchronize: false,
             autoLoadEntities: true,
         };

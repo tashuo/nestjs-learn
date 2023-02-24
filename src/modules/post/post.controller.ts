@@ -19,18 +19,21 @@ import { Queue } from 'bull';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { User } from 'src/common/decorators/user.decorator';
+import { BaseController } from 'src/common/base/controller.base';
 
 @Controller('post')
-export class PostController {
+export class PostController extends BaseController {
     constructor(
         private readonly postService: PostService,
         @InjectQueue('default') private queue: Queue,
         @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-    ) {}
+    ) {
+        super();
+    }
 
     @Post()
-    create(@User() user, @Body() createPostDto: CreatePostDto) {
-        return this.postService.create(createPostDto, user.id);
+    async create(@User() user, @Body() createPostDto: CreatePostDto) {
+        return this.successResponse(await this.postService.create(createPostDto, user));
     }
 
     // TypeScript 不存储泛型或接口的元数据，因此当你在 DTO 中使用它们的时候， ValidationPipe 可能不能正确验证输入数据
@@ -51,12 +54,6 @@ export class PostController {
 
     @Get(':id')
     async findOne(@Param('id') id: string) {
-        throw new InternalServerErrorException('test error');
-        await this.queue.add({ job: `id-${id}` });
-        this.logger.debug('debug test');
-        this.logger.info('info test');
-        this.logger.warn('warn test');
-        this.logger.error('errortest');
         return this.postService.findOne(+id);
     }
 
