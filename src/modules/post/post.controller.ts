@@ -24,6 +24,7 @@ import { ApiCreatedResponse } from '@nestjs/swagger';
 import { Post as PostEntity } from './entities/post.entity';
 import { CommonResponseDto } from './dto/common-response.dto';
 import { PostResponseDto } from './dto/post-response.dto';
+import { Guest } from 'src/common/decorators/guest.decorator';
 
 @Controller('post')
 export class PostController extends BaseController {
@@ -53,9 +54,10 @@ export class PostController extends BaseController {
         return 'testing';
     }
 
+    @Guest()
     @Get()
-    findAll() {
-        return this.postService.findAll();
+    async findAll() {
+        return this.successResponse(await this.postService.findAll());
     }
 
     @Get(':id')

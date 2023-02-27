@@ -12,12 +12,11 @@ export class HttpException2Filter implements ExceptionFilter {
     catch(exception: ServiceUnavailableException, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
-        const request = ctx.getRequest<Request>();
         const status = exception.getStatus();
         response.status(status).json({
-            statusCode: status,
+            code: status,
             timestamp: new Date().toISOString(),
-            path: request.url,
+            message: 'something goes wrong~',
         });
     }
 }
