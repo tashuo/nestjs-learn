@@ -17,6 +17,7 @@ async function bootstrap() {
         .setDescription('test description')
         .setVersion('1.0')
         .addTag('post')
+        .addBearerAuth()
         .build();
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('doc', app, document);

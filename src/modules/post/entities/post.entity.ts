@@ -47,6 +47,10 @@ export class Post extends BaseEntity {
     @Column()
     content: string;
 
+    /**
+     * 文章类型
+     * @example text
+     */
     @Column({
         type: 'enum',
         enum: ContentType,

@@ -20,6 +20,10 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { User } from 'src/common/decorators/user.decorator';
 import { BaseController } from 'src/common/base/controller.base';
+import { ApiCreatedResponse } from '@nestjs/swagger';
+import { Post as PostEntity } from './entities/post.entity';
+import { CommonResponseDto } from './dto/common-response.dto';
+import { PostResponseDto } from './dto/post-response.dto';
 
 @Controller('post')
 export class PostController extends BaseController {
@@ -31,6 +35,8 @@ export class PostController extends BaseController {
         super();
     }
 
+    // @ApiCreatedResponse({ description: 'test description', type: CommonResponseDto<PostEntity> })
+    @ApiCreatedResponse({ description: 'test description', type: PostResponseDto })
     @Post()
     async create(@User() user, @Body() createPostDto: CreatePostDto) {
         return this.successResponse(await this.postService.create(createPostDto, user));
