@@ -23,7 +23,6 @@ export class UserController {
     // @Guest()
     @Post('login')
     async login(@Req() req) {
-        console.log('123');
         return this.authService.login(req.user);
     }
 

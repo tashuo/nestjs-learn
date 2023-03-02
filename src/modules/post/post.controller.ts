@@ -60,6 +60,7 @@ export class PostController extends BaseController {
         return this.successResponse(await this.postService.findAll());
     }
 
+    @Guest()
     @Get(':id')
     async findOne(@Param('id') id: string) {
         return this.postService.findOne(+id);

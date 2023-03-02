@@ -85,11 +85,11 @@
     "colId": "history",
     "containerId": "",
     "name": "127.0.0.1:3000/post/1",
-    "url": "127.0.0.1:3000/post/14",
+    "url": "127.0.0.1:3000/post/68",
     "method": "GET",
     "sortNum": 0,
     "created": "2022-12-17T13:53:28.564Z",
-    "modified": "2023-02-24T15:11:48.065Z",
+    "modified": "2023-03-02T07:03:11.858Z",
     "headers": [
       {
         "name": "Authorization",

@@ -20,7 +20,7 @@ export class TagService {
             } as any)
             .orIgnore()
             .execute();
-        console.log(ret.raw.affectedRows);
+        // console.log(ret.raw.affectedRows);
         return await this.tagRepository.findOne({
             where: { name: createTagDto.name },
             relations: ['user'],
@@ -55,11 +55,10 @@ export class TagService {
             relations: ['user'],
             where: { id: id, user: { id: user.id } },
         });
-        console.log(tag);
         if (isNil(tag)) {
             return;
         }
 
-        Tag.delete(id);
+        await Tag.delete(id);
     }
 }

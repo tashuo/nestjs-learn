@@ -5,7 +5,6 @@ import { resolve } from 'path';
 const configService = ConfigService.loadSync(resolve(__dirname, '../config/!(*.d).{ts,js}'), {
     path: resolve(__dirname, '../../.env'),
 });
-console.log(resolve(__dirname, '../modules/**/entities/*.{js,ts}'));
 const dataSource = new DataSource({
     ...configService.get('database'),
     entities: [resolve(__dirname, '../modules/**/entities/*.{js,ts}')],

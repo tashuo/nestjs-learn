@@ -24,12 +24,12 @@ export class PostService {
         return await Post.findOne({ where: { id: post.id }, relations: ['user', 'tags'] });
     }
 
-    findAll() {
-        return Post.find({ relations: ['user', 'tags'] });
+    async findAll() {
+        return await Post.find({ relations: ['user', 'tags'], order: { id: 'DESC' } });
     }
 
-    findOne(id: number) {
-        return Post.findOne({ where: { id: id }, relations: ['user', 'tags'] });
+    async findOne(id: number) {
+        return await Post.findOne({ where: { id: id }, relations: ['user', 'tags'] });
     }
 
     async update(id: number, updatePostDto: UpdatePostDto) {
@@ -40,7 +40,7 @@ export class PostService {
         await post.save();
     }
 
-    remove(id: number) {
-        Post.delete({ id: id });
+    async remove(id: number) {
+        await Post.delete({ id: id });
     }
 }
