@@ -67,9 +67,12 @@ $ pnpm test:cov
 - [x] jwt鉴权
 - [x] 异步队列
 - [x] typeorm(migrate&&relations)
-- [ ] crud组件
-- [ ] 单元测试
+- [x] crud组件
+- [x] 单元测试
+- [x] 接口文档
 - [ ] 其他
+  - [ ] e2e测试用例自动开启事务
+  - [ ] 接口文档CommonResponseDto
 
 ## License
 
