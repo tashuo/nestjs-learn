@@ -20,11 +20,14 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { User } from 'src/common/decorators/user.decorator';
 import { BaseController } from 'src/common/base/controller.base';
-import { ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiExtraModels } from '@nestjs/swagger';
 import { Post as PostEntity } from './entities/post.entity';
 import { CommonResponseDto } from './dto/common-response.dto';
 import { PostResponseDto } from './dto/post-response.dto';
 import { Guest } from 'src/common/decorators/guest.decorator';
+
+import { GenerateSwaggerResponse } from 'src/common/decorators/response.decorator';
+import { CustomBaseResponse } from 'src/common/base/response.dto';
 
 @Controller('post')
 export class PostController extends BaseController {
@@ -36,10 +39,13 @@ export class PostController extends BaseController {
         super();
     }
 
-    // @ApiCreatedResponse({ description: 'test description', type: CommonResponseDto<PostEntity> })
-    @ApiCreatedResponse({ description: 'test description', type: PostResponseDto })
+    @ApiExtraModels(PostEntity)
+    @GenerateSwaggerResponse(PostEntity, 'single')
     @Post()
-    async create(@User() user, @Body() createPostDto: CreatePostDto) {
+    async create(
+        @User() user,
+        @Body() createPostDto: CreatePostDto,
+    ): Promise<CustomBaseResponse<PostEntity>> {
         return this.successResponse(await this.postService.create(createPostDto, user));
     }
 
@@ -54,16 +60,18 @@ export class PostController extends BaseController {
         return 'testing';
     }
 
+    @GenerateSwaggerResponse(PostEntity, 'page')
     @Guest()
     @Get()
-    async findAll() {
+    async findAll(): Promise<CustomBaseResponse<PostEntity>> {
         return this.successResponse(await this.postService.findAll());
     }
 
+    @GenerateSwaggerResponse(PostEntity, 'single')
     @Guest()
     @Get(':id')
-    async findOne(@Param('id') id: string) {
-        return this.postService.findOne(+id);
+    async findOne(@Param('id') id: string): Promise<CommonResponseDto<PostEntity>> {
+        return this.successResponse(await this.postService.findOne(+id));
     }
 
     @Patch(':id')

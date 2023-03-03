@@ -1,5 +1,6 @@
 import { ClassSerializerInterceptor, Injectable, UseInterceptors } from '@nestjs/common';
 import { RESPONSE_CODE_FAILED, RESPONSE_CODE_SUCCESS } from 'src/constants/response.code';
+import { CustomBaseResponse } from './response.dto';
 
 @Injectable()
 @UseInterceptors(ClassSerializerInterceptor)
@@ -13,11 +14,6 @@ export abstract class BaseController {
     }
 
     async response(code?: number, data?: any, message?: string): Promise<any> {
-        return {
-            code: code,
-            data: data,
-            message: message,
-            timestamp: new Date().toISOString(),
-        };
+        return new CustomBaseResponse(code, message, data);
     }
 }

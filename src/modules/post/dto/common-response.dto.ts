@@ -1,18 +1,14 @@
-import { IsNumber, Length } from 'class-validator';
-
 export class CommonResponseDto<T> {
     /**
      * response code
      * @example 200
      */
-    @IsNumber()
     code: number;
 
     /**
      * error message, default empty
      * @example permission denied
      */
-    @Length(0, 1000)
     message?: string;
 
     /**
@@ -22,7 +18,7 @@ export class CommonResponseDto<T> {
 
     /**
      * response timestamp
-     * @example 0
+     * @example 2023-03-03T07:17:32.020Z
      */
     timestamp: Date;
 }
