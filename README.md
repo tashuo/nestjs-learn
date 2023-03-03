@@ -72,7 +72,7 @@ $ pnpm test:cov
 - [x] 接口文档
 - [ ] 其他
   - [ ] e2e测试用例自动开启事务
-  - [ ] 接口文档CommonResponseDto
+  - [x] 接口文档CommonResponseDto
 
 ## License
 
