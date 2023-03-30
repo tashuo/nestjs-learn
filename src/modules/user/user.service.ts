@@ -29,4 +29,19 @@ export class UserService {
             password: Md5.hashStr(loginDto.password),
         });
     }
+
+    async detail(user_id: number) {
+        return await User.findOne({
+            where: { id: user_id },
+            relations: ['followers'],
+        });
+    }
+
+    async follow(user: User, user_id: number) {
+        console.log(user, user_id);
+        return User.createQueryBuilder(User.name)
+            .relation(User, 'following')
+            .of(user)
+            .add([user_id]);
+    }
 }

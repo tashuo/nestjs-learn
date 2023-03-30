@@ -65,11 +65,11 @@
     "method": "POST",
     "sortNum": 0,
     "created": "2022-12-17T13:53:17.126Z",
-    "modified": "2023-02-24T11:44:13.593Z",
+    "modified": "2023-03-30T14:47:43.565Z",
     "headers": [
       {
         "name": "Authorization",
-        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoxLCJpYXQiOjE2NzcyMTE5MDQsImV4cCI6MTY3NzI5ODMwNH0.g_hiuAW-GlqLbAH8Z2ZI1Jed_6FSW_RRyNeRloJbDxI"
+        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoxLCJpYXQiOjE2ODAxODc2NTQsImV4cCI6MTY4MDI3NDA1NH0.hpVlA9fiMKZrQvxGFKhb0ZTufsTo8bSJZZbAxbQkM1s"
       }
     ],
     "params": [],
@@ -204,6 +204,44 @@
       {
         "name": "Authorization",
         "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoxLCJpYXQiOjE2NzcyMTE5MDQsImV4cCI6MTY3NzI5ODMwNH0.g_hiuAW-GlqLbAH8Z2ZI1Jed_6FSW_RRyNeRloJbDxI"
+      }
+    ],
+    "params": [],
+    "tests": []
+  },
+  {
+    "_id": "0bf268ca-df57-4fae-82ba-3b6c9b34a97e",
+    "colId": "history",
+    "containerId": "",
+    "name": "127.0.0.1:3000/user/profile",
+    "url": "127.0.0.1:3000/user/profile",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2023-03-30T14:46:46.800Z",
+    "modified": "2023-03-30T14:48:06.175Z",
+    "headers": [
+      {
+        "name": "Authorization",
+        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoxLCJpYXQiOjE2ODAxODc2NTQsImV4cCI6MTY4MDI3NDA1NH0.hpVlA9fiMKZrQvxGFKhb0ZTufsTo8bSJZZbAxbQkM1s"
+      }
+    ],
+    "params": [],
+    "tests": []
+  },
+  {
+    "_id": "d0ab825c-a797-42e1-acb4-0eb3c400cc37",
+    "colId": "history",
+    "containerId": "",
+    "name": "127.0.0.1:3000/user/follow",
+    "url": "127.0.0.1:3000/user/follow",
+    "method": "POST",
+    "sortNum": 0,
+    "created": "2023-03-30T15:04:27.899Z",
+    "modified": "2023-03-30T15:07:45.612Z",
+    "headers": [
+      {
+        "name": "Authorization",
+        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoxLCJpYXQiOjE2ODAxODc2NTQsImV4cCI6MTY4MDI3NDA1NH0.hpVlA9fiMKZrQvxGFKhb0ZTufsTo8bSJZZbAxbQkM1s"
       }
     ],
     "params": [],

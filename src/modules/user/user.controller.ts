@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Guest } from 'src/common/decorators/guest.decorator';
+import { User } from 'src/common/decorators/user.decorator';
 import { LocalAuthGuard } from 'src/common/guards/local-auth.guard';
 import { AuthService } from '../auth/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
 
-@Guest()
 @Controller('user')
 export class UserController {
     constructor(
@@ -29,6 +29,12 @@ export class UserController {
     // @UseGuards(AuthGuard('jwt'))
     @Get('profile')
     async profile(@Req() req) {
-        return req.user;
+        console.log(11);
+        return this.userService.detail(req.user.id);
+    }
+
+    @Post('follow')
+    async follow(@Req() req) {
+        return await this.userService.follow(req.user, 5);
     }
 }
