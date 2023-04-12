@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { ConfigService } from 'nestjs-config';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AuthenticatedSocketIoAdapter } from './modules/ws/authenticated.socketio.adapter';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
@@ -10,6 +11,7 @@ async function bootstrap() {
     });
     const config = app.get(ConfigService);
     app.useGlobalPipes(new ValidationPipe()); // 开启数据校验
+    app.useWebSocketAdapter(new AuthenticatedSocketIoAdapter(app));
 
     // swagger
     const options = new DocumentBuilder()

@@ -29,7 +29,10 @@ export class PostService {
     }
 
     async findOne(id: number) {
-        return await Post.findOne({ where: { id: id }, relations: ['user', 'tags'] });
+        return await Post.findOne({
+            where: { id: id },
+            relations: ['user', 'tags', 'postToCategories', 'categories'],
+        });
     }
 
     async update(id: number, updatePostDto: UpdatePostDto) {

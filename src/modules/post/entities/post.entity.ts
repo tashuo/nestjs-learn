@@ -8,6 +8,7 @@ import {
     JoinTable,
     ManyToMany,
     ManyToOne,
+    OneToMany,
     OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
@@ -15,6 +16,8 @@ import {
 import { PostExtra } from './post_extra.entity';
 import { Tag as TagEntity } from '../../tag/entities/tag.entity';
 import { Exclude, Expose } from 'class-transformer';
+import { Category } from './category.entity';
+import { PostToCategory } from './postToCategory.entity';
 
 export enum ContentType {
     HTML = 'html',
@@ -79,4 +82,10 @@ export class Post extends BaseEntity {
 
     @OneToOne(() => PostExtra, (extra) => extra.post)
     extra: PostExtra;
+
+    @ManyToMany(() => Category, (category) => category.posts)
+    categories: Category[];
+
+    @OneToMany(() => PostToCategory, (postToCategory) => postToCategory.post)
+    postToCategories: PostToCategory[];
 }

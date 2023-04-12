@@ -33,7 +33,7 @@ export class UserService {
     async detail(user_id: number) {
         return await User.findOne({
             where: { id: user_id },
-            relations: ['followers'],
+            relations: ['followers', 'followers_2'],
         });
     }
 

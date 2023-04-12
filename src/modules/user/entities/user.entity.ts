@@ -49,17 +49,17 @@ export class User extends BaseEntity {
     tags!: Tag[];
 
     // 第一种做法，直接ManyToMany，使用没问题
-    // @ManyToMany(() => User, (user) => user.following)
-    // @JoinTable()
-    // followers: User[];
+    @ManyToMany(() => User, (user) => user.following)
+    @JoinTable()
+    followers: User[];
 
-    // @ManyToMany(() => User, (user) => user.followers)
-    // following: User[];
+    @ManyToMany(() => User, (user) => user.followers)
+    following: User[];
 
     // 第二种做法，自定义entity，有问题
     @OneToMany(() => UserFollowerEntity, (follow) => follow.follower)
-    followers: UserFollowerEntity[];
+    followers_2: User[];
 
     @OneToMany(() => UserFollowerEntity, (follow) => follow.user)
-    following: UserFollowerEntity[];
+    following_2: User[];
 }

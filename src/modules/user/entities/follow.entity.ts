@@ -15,7 +15,7 @@ export class UserFollowerEntity extends BaseEntity {
     user: User;
 
     @Expose()
-    @ManyToOne(() => User, (user) => user.followers)
+    @ManyToOne(() => User, (user) => user.followers_2)
     follower: User;
 
     @Column({

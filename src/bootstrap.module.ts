@@ -10,6 +10,9 @@ import { UserModule } from './modules/user/user.module';
 import { TypeOrmConfigService } from './providers/typeorm.config.service';
 import * as winston from 'winston';
 import { TagModule } from './modules/tag/tag.module';
+import { WsModule } from './modules/ws/ws.module';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './constants/jwt';
 
 @Module({
     imports: [
@@ -18,6 +21,7 @@ import { TagModule } from './modules/tag/tag.module';
         CommentModule,
         UserModule,
         TagModule,
+        WsModule,
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
             useClass: TypeOrmConfigService, // 同useFactory,useClass不需要inject
@@ -48,6 +52,15 @@ import { TagModule } from './modules/tag/tag.module';
                 ],
             }),
         }),
+        {
+            ...JwtModule.register({
+                secret: jwtConstants.secret,
+                signOptions: {
+                    expiresIn: '1d',
+                },
+            }),
+            global: true,
+        },
     ],
 })
 export class BootstrapModule {}

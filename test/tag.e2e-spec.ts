@@ -28,7 +28,7 @@ describe('TagController (e2e)', () => {
         await app.init();
 
         const entityManager = moduleFixture.get(EntityManager);
-        queryRunner = entityManager.queryRunner = dataSource.createQueryRunner();
+        // queryRunner = entityManager.queryRunner = dataSource.createQueryRunner();
     });
 
     it('GET /tag', () => {
