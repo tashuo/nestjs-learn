@@ -13,6 +13,7 @@ export class AuthenticatedSocketIoAdapter extends IoAdapter {
     createIOServer(port: number, options?: SocketIO.ServerOptions): any {
         options.allowRequest = async (request, allowFunction) => {
             try {
+                console.log('allowRequest valid');
                 const token = request.headers.authorization.replace('Bearer ', '');
                 const verified = token && (await this.jwtService.verify(token));
                 if (verified) {

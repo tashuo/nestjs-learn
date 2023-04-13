@@ -1,73 +1,75 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException, UseGuards } from '@nestjs/common';
 import {
+    ConnectedSocket,
     MessageBody,
     OnGatewayConnection,
     OnGatewayDisconnect,
     OnGatewayInit,
     SubscribeMessage,
     WebSocketGateway,
-    WebSocketServer,
+    WsResponse,
 } from '@nestjs/websockets';
-
-// import { Server } from 'ws';
 
 import { Server } from 'socket.io';
 
-import * as net from 'net';
-
-import { getClientIp } from 'request-ip';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { JwtService } from '@nestjs/jwt';
-import { ValidationError } from 'class-validator';
+import { SocketWithUserData, UserSocket } from './types';
+import { Observable, of } from 'rxjs';
+import { WsAuthGuard } from 'src/common/guards/ws-auth.guard';
+import { WsService } from './ws.service';
 
 @Injectable()
+// @UseGuards(WsAuthGuard)
 @WebSocketGateway(3002, { cors: true, transports: ['websocket'] })
 export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
-    // constructor(
-    //     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-    //     private readonly jwtService: JwtService,
-    // ) {}
+    constructor(
+        @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+        private readonly jwtService: JwtService,
+        private readonly wsService: WsService,
+    ) {}
 
-    @WebSocketServer()
-    server: Server;
-
-    async afterInit(wss: Server) {
+    async afterInit(ws: Server) {
+        this.wsService.setServer(ws);
         console.log('inited');
-        // const httpServer: net.Server = wss._server;
-        // httpServer.removeAllListeners('upgrade');
-        // httpServer.on('upgrade', async (req, socket, head) => {
-        //     const userIp = getClientIp(req);
-
-        //     try {
-        //         await this.jwtService.verify(req.headers);
-        //         this.logger.log(`Auth good for user with IP: ${userIp}` as any);
-
-        //         wss.handleUpgrade(req, socket, head, function done(ws) {
-        //             wss.emit('connection', ws, req);
-        //         });
-        //     } catch (e) {
-        //         if (e instanceof ValidationError) {
-        //             this.logger.warn(`Auth bad for user with IP ${userIp}: ${e}`);
-        //             return abortHandshake(socket, 401);
-        //         } else {
-        //             this.logger.error(`Auth user error: ${e.message}`, e.stack);
-        //             return abortHandshake(socket, 500);
-        //         }
-        //     }
-        // });
     }
 
-    async handleConnection() {
-        console.log('connect');
+    async handleConnection(client: SocketWithUserData) {
+        try {
+            const token = client.handshake.headers.authorization.replace('Bearer ', '');
+            const { sub } = await this.jwtService.decode(token);
+            client.user = {
+                id: sub,
+                lastActiveTime: client.handshake.issued,
+            };
+            this.wsService.addUserSocket(sub, client);
+            console.log(client.user);
+        } catch (error) {
+            console.log(error);
+            throw new UnauthorizedException();
+        }
+
+        // todo ws用户登录事件
+        console.log('connect ' + client.user.id);
     }
 
-    async handleDisconnect() {
+    async handleDisconnect(client: SocketWithUserData) {
+        this.wsService.removeUserSocket(client.user.id);
         console.log('disconnect');
     }
 
     @SubscribeMessage('heartbeat')
-    handleEvent(@MessageBody() data: string): string {
-        return data;
+    heartbeat(@ConnectedSocket() client: SocketWithUserData): Observable<WsResponse<number> | any> {
+        console.log('heartbeat');
+        client.user.lastActiveTime = Date.now();
+        return of(client.user);
+    }
+
+    @SubscribeMessage('chat')
+    chat(@MessageBody() data: any): Observable<WsResponse<number> | any> {
+        console.log(`send message: ${data.message}`);
+        this.wsService.pushMessageToUser(data.toUserId, 'chat', data.message);
+        return;
     }
 }

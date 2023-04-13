@@ -46,12 +46,12 @@
     "method": "POST",
     "sortNum": 0,
     "created": "2022-12-17T09:57:26.466Z",
-    "modified": "2023-02-17T05:05:28.564Z",
+    "modified": "2023-04-13T05:33:20.242Z",
     "headers": [],
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"123456\"\n}",
+      "raw": "{\n  \"username\": \"test2\",\n  \"password\": \"123456\"\n}",
       "form": []
     },
     "tests": []
