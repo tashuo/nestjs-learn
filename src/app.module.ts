@@ -10,7 +10,7 @@ import { TagModule } from './modules/tag/tag.module';
 @Module({
     imports: [BootstrapModule, TagModule],
     providers: [
-        DefaultConsumer, // 注册后才会消费
+        // DefaultConsumer, // 注册后才会消费
         {
             provide: APP_GUARD,
             useClass: JwtAuthGuard,

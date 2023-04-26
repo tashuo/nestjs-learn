@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from 'class-transformer';
-import { User } from '../../user/entities/user.entity';
+import { UserEntity } from '../../user/entities/user.entity';
 import {
     BaseEntity,
     Column,
@@ -19,14 +19,14 @@ export class Tag extends BaseEntity {
     @Column({ unique: true })
     name: string;
 
-    @ManyToOne(() => User, (user) => user.tags, {
+    @ManyToOne(() => UserEntity, (user) => user.tags, {
         nullable: false,
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
     })
     @Index()
-    @Type(() => User)
-    user?: User;
+    @Type(() => UserEntity)
+    user?: UserEntity;
 
     @CreateDateColumn()
     created_at: Date;

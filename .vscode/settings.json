@@ -12,5 +12,6 @@
     "npm.packageManager": "pnpm",
     "thunder-client.saveToWorkspace": true,
     "thunder-client.showActivityFromCollection": false,
-    "thunder-client.workspaceRelativePath": "./"
+    "thunder-client.workspaceRelativePath": "./",
+    "vue.features.codeActions.enable": false
 }

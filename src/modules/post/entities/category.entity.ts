@@ -7,7 +7,7 @@ import {
     ManyToMany,
     JoinTable,
 } from 'typeorm';
-import { Post } from './post.entity';
+import { PostEntity } from './post.entity';
 import { PostToCategory } from './postToCategory.entity';
 
 @Entity()
@@ -21,9 +21,9 @@ export class Category {
     @Column()
     text: string;
 
-    @ManyToMany(() => Post, (post) => post.categories)
+    @ManyToMany(() => PostEntity, (post) => post.categories)
     @JoinTable()
-    posts: Post[];
+    posts: PostEntity[];
 
     @OneToMany(() => PostToCategory, (postToCategory) => postToCategory.category)
     public postToCategories: PostToCategory[];

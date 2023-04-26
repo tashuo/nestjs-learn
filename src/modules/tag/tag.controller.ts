@@ -2,9 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { TagService } from './tag.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
-import { User } from 'src/common/decorators/user.decorator';
-import { User as UserEntity } from '../user/entities/user.entity';
-import { BaseController } from 'src/common/base/controller.base';
+import { User } from '../../common/decorators/user.decorator';
+import { UserEntity } from '../user/entities/user.entity';
+import { BaseController } from '../../common/base/controller.base';
 
 @Controller('tag')
 export class TagController extends BaseController {

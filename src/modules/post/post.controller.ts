@@ -21,7 +21,7 @@ import { Logger } from 'winston';
 import { User } from 'src/common/decorators/user.decorator';
 import { BaseController } from 'src/common/base/controller.base';
 import { ApiCreatedResponse, ApiExtraModels } from '@nestjs/swagger';
-import { Post as PostEntity } from './entities/post.entity';
+import { PostEntity } from './entities/post.entity';
 import { CommonResponseDto } from './dto/common-response.dto';
 import { PostResponseDto } from './dto/post-response.dto';
 import { Guest } from 'src/common/decorators/guest.decorator';

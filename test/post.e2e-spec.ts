@@ -2,24 +2,27 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
-import { Post } from 'src/modules/post/entities/post.entity';
+import { PostEntity } from 'src/modules/post/entities/post.entity';
 import { getRandomNumber, uniqid } from 'src/utils/tool';
 
-describe('PostController (e2e)', () => {
+describe('EPostEntityController (e2e)', () => {
     let app: INestApplication;
 
     let TOKEN: string;
 
-    let posts: Array<Post>;
+    let posts: Array<PostEntity>;
 
-    beforeEach(async () => {
-        // todo 自动开启事务
+    beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [AppModule],
         }).compile();
 
         app = moduleFixture.createNestApplication();
         await app.init();
+    });
+
+    afterAll(async () => {
+        await app.close();
     });
 
     afterEach(async () => {
@@ -43,9 +46,9 @@ describe('PostController (e2e)', () => {
     it('登录', async () => {
         const response = await request(app.getHttpServer())
             .post('/user/login')
-            .send({ username: 'admin', password: '123456' });
+            .send({ username: 'test-1', password: '123456' });
         expect(response.status).toEqual(201);
-        TOKEN = response.body.access_token;
+        TOKEN = response.body.data.access_token;
     });
 
     it('创建文章', async () => {

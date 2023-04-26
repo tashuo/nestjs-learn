@@ -1,4 +1,4 @@
-import { User } from '../../user/entities/user.entity';
+import { UserEntity } from '../../user/entities/user.entity';
 import {
     BaseEntity,
     Column,
@@ -13,7 +13,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { PostExtra } from './post_extra.entity';
+import { PostExtraEntity } from './post_extra.entity';
 import { Tag as TagEntity } from '../../tag/entities/tag.entity';
 import { Exclude, Expose } from 'class-transformer';
 import { Category } from './category.entity';
@@ -31,18 +31,20 @@ export enum STATUS {
 }
 
 @Entity()
-export class Post extends BaseEntity {
+export class PostEntity extends BaseEntity {
+    [key: string]: any;
+
     @PrimaryGeneratedColumn()
     id: number;
 
     @Expose()
-    @ManyToOne(() => User, (user) => user.posts, {
+    @ManyToOne(() => UserEntity, (user) => user.posts, {
         nullable: false,
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
     })
     @Index()
-    user: User;
+    user: UserEntity;
 
     @Column()
     title: string;
@@ -80,8 +82,8 @@ export class Post extends BaseEntity {
     @JoinTable()
     tags?: TagEntity[];
 
-    @OneToOne(() => PostExtra, (extra) => extra.post)
-    extra: PostExtra;
+    @OneToOne(() => PostExtraEntity, (extra) => extra.post)
+    extra: PostExtraEntity;
 
     @ManyToMany(() => Category, (category) => category.posts)
     categories: Category[];

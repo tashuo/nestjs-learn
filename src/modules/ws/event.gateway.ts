@@ -32,7 +32,6 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect, O
 
     async afterInit(ws: Server) {
         this.wsService.setServer(ws);
-        console.log('inited');
     }
 
     async handleConnection(client: SocketWithUserData) {
@@ -44,14 +43,12 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect, O
                 lastActiveTime: client.handshake.issued,
             };
             this.wsService.addUserSocket(sub, client);
-            console.log(client.user);
         } catch (error) {
-            console.log(error);
             throw new UnauthorizedException();
         }
 
         // todo ws用户登录事件
-        console.log('connect ' + client.user.id);
+        // console.log('connect ' + client.user.id);
     }
 
     async handleDisconnect(client: SocketWithUserData) {

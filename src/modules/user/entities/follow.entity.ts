@@ -1,7 +1,7 @@
 import { Expose } from 'class-transformer';
 import { BaseEntity, Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-import { User } from './user.entity';
+import { UserEntity } from './user.entity';
 
 @Entity('user_followers')
 @Index('idx_follower_uid', ['follower'])
@@ -11,12 +11,12 @@ export class UserFollowerEntity extends BaseEntity {
     id: number;
 
     @Expose()
-    @ManyToOne(() => User, (user) => user.following)
-    user: User;
+    @ManyToOne(() => UserEntity, (user) => user.following)
+    user: UserEntity;
 
     @Expose()
-    @ManyToOne(() => User, (user) => user.followers_2)
-    follower: User;
+    @ManyToOne(() => UserEntity, (user) => user.followers_2)
+    follower: UserEntity;
 
     @Column({
         comment: '关注时间戳',

@@ -2,7 +2,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from 'nestjs-config';
 import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AuthenticatedSocketIoAdapter } from './modules/ws/authenticated.socketio.adapter';
 
 async function bootstrap() {
@@ -10,19 +9,9 @@ async function bootstrap() {
         logger: ['error', 'warn', 'debug', 'verbose', 'log'],
     });
     const config = app.get(ConfigService);
-    app.useGlobalPipes(new ValidationPipe()); // 开启数据校验
+    app.useGlobalPipes(new ValidationPipe());
     app.useWebSocketAdapter(new AuthenticatedSocketIoAdapter(app));
-
-    // swagger
-    const options = new DocumentBuilder()
-        .setTitle('test title')
-        .setDescription('test description')
-        .setVersion('1.0')
-        .addTag('post')
-        .addBearerAuth()
-        .build();
-    const document = SwaggerModule.createDocument(app, options);
-    SwaggerModule.setup('doc', app, document);
+    app.init();
 
     await app.listen(config.get('app.port'));
 }

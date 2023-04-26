@@ -1,5 +1,5 @@
 import { IsNumber, Length } from 'class-validator';
-import { Post } from '../entities/post.entity';
+import { PostEntity } from '../entities/post.entity';
 
 export class PostResponseDto {
     /**
@@ -19,7 +19,7 @@ export class PostResponseDto {
     /**
      * response data
      */
-    data?: Post;
+    data?: PostEntity;
 
     /**
      * response timestamp

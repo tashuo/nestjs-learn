@@ -1,4 +1,4 @@
-import { Post } from '../../post/entities/post.entity';
+import { PostEntity } from '../../post/entities/post.entity';
 import {
     BaseEntity,
     Column,
@@ -15,7 +15,9 @@ import { Exclude } from 'class-transformer';
 import { UserFollowerEntity } from './follow.entity';
 
 @Entity()
-export class User extends BaseEntity {
+export class UserEntity extends BaseEntity {
+    [key: string]: any;
+
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -27,11 +29,11 @@ export class User extends BaseEntity {
     @Column()
     nickname: string;
 
+    @Column()
+    avatar: string;
+
     @Exclude()
-    @Column({
-        type: 'char',
-        length: 32,
-    })
+    @Column()
     password: string;
 
     @Exclude()
@@ -42,24 +44,24 @@ export class User extends BaseEntity {
     @UpdateDateColumn()
     updated_at: Date;
 
-    @OneToMany(() => Post, (post) => post.user)
-    posts!: Post[];
+    @OneToMany(() => PostEntity, (post) => post.user)
+    posts!: PostEntity[];
 
     @OneToMany(() => Tag, (tag) => tag.user)
     tags!: Tag[];
 
     // 第一种做法，直接ManyToMany，使用没问题
-    @ManyToMany(() => User, (user) => user.following)
+    @ManyToMany(() => UserEntity, (user) => user.following)
     @JoinTable()
-    followers: User[];
+    followers: UserEntity[];
 
-    @ManyToMany(() => User, (user) => user.followers)
-    following: User[];
+    @ManyToMany(() => UserEntity, (user) => user.followers)
+    following: UserEntity[];
 
     // 第二种做法，自定义entity，有问题
     @OneToMany(() => UserFollowerEntity, (follow) => follow.follower)
-    followers_2: User[];
+    followers_2: UserEntity[];
 
     @OneToMany(() => UserFollowerEntity, (follow) => follow.user)
-    following_2: User[];
+    following_2: UserEntity[];
 }

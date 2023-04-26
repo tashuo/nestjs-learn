@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '../user/entities/user.entity';
+import { UserEntity } from '../user/entities/user.entity';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { Tag } from './entities/tag.entity';
@@ -9,7 +9,7 @@ import { isNil } from 'lodash';
 @Injectable()
 export class TagService {
     constructor(private readonly tagRepository: TagRepository) {}
-    async create(createTagDto: CreateTagDto, user: User) {
+    async create(createTagDto: CreateTagDto, user: UserEntity) {
         const ret = await this.tagRepository
             .createQueryBuilder()
             .insert()
@@ -35,7 +35,7 @@ export class TagService {
         return await this.tagRepository.findOne({ where: { id: id }, relations: ['user'] });
     }
 
-    async update(id: string, updateTagDto: UpdateTagDto, user: User) {
+    async update(id: string, updateTagDto: UpdateTagDto, user: UserEntity) {
         const tag = await Tag.findOne({
             relations: ['user'],
             where: { id: id, user: { id: user.id } },
@@ -50,7 +50,7 @@ export class TagService {
         return await this.tagRepository.findOne({ where: { id: id }, relations: ['user'] });
     }
 
-    async remove(id: string, user: User) {
+    async remove(id: string, user: UserEntity) {
         const tag = await Tag.findOne({
             relations: ['user'],
             where: { id: id, user: { id: user.id } },

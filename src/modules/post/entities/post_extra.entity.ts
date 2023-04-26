@@ -1,8 +1,8 @@
 import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import { Post as PostEntity } from './post.entity';
+import { PostEntity } from './post.entity';
 
 @Entity('post_extra')
-export class PostExtra extends BaseEntity {
+export class PostExtraEntity extends BaseEntity {
     @PrimaryColumn()
     post_id: number;
     @OneToOne(() => PostEntity, (post) => post.extra, {
