@@ -6,12 +6,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthService } from '../auth/auth.service';
 import { UserFollowerEntity } from './entities/follow.entity';
 import * as bcrypt from 'bcrypt';
+import { FollowService } from './follow.service';
 
 @Module({
-    providers: [UserService, AuthService],
+    providers: [UserService, AuthService, FollowService],
     controllers: [UserController],
     imports: [TypeOrmModule.forFeature([UserEntity, UserFollowerEntity])],
-    exports: [UserService],
+    exports: [UserService, FollowService],
 })
 export class UserModule implements OnApplicationBootstrap {
     async onApplicationBootstrap() {

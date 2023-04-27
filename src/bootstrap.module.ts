@@ -3,31 +3,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { WinstonModule } from 'nest-winston';
 import { ConfigModule, ConfigService } from 'nestjs-config';
 import * as path from 'path';
-import { AuthModule } from './modules/auth/auth.module';
-import { CommentModule } from './modules/comment/comment.module';
-import { PostModule } from './modules/post/post.module';
-import { UserModule } from './modules/user/user.module';
 import { TypeOrmConfigService } from './providers/typeorm.config.service';
 import * as winston from 'winston';
-import { TagModule } from './modules/tag/tag.module';
-import { WsModule } from './modules/ws/ws.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants/jwt';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
     imports: [
         ConfigModule.load(path.resolve(__dirname, 'config', '!(*.d).{ts,js}')),
-        PostModule,
-        CommentModule,
-        UserModule,
-        TagModule,
-        WsModule,
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
             useClass: TypeOrmConfigService, // 同useFactory,useClass不需要inject
         }),
-        AuthModule,
         WinstonModule.forRootAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
@@ -81,6 +70,17 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
             }),
             global: true,
         },
+        BullModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: (config: ConfigService) => ({
+                redis: {
+                    host: config.get('redis.host'),
+                    port: config.get('redis.port'),
+                    password: config.get('redis.password'),
+                },
+            }),
+        }),
     ],
 })
 export class BootstrapModule {}

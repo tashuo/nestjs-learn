@@ -9,12 +9,14 @@ import { UserService } from './user.service';
 import { FollowDto, QueryFollowersDto, QueryFollowingsDto, UnfollowDto } from './dto/follow.dto';
 import { UserEntity } from './entities/user.entity';
 import { BaseController } from '../../common/base/controller.base';
+import { FollowService } from './follow.service';
 
 @Controller('user')
 export class UserController extends BaseController {
     constructor(
         private readonly userService: UserService,
         private readonly authService: AuthService,
+        private readonly followService: FollowService,
     ) {
         super();
     }
@@ -38,23 +40,23 @@ export class UserController extends BaseController {
 
     @Post('follow')
     async follow(@Body() followDto: FollowDto, @User() user: UserEntity) {
-        return this.successResponse(await this.userService.follow(user, followDto.userId));
+        return this.successResponse(await this.followService.follow(user, followDto.userId));
     }
 
     @Post('unfollow')
     async unfollow(@Body() followDto: UnfollowDto, @User() user: UserEntity) {
-        return this.successResponse(await this.userService.unfollow(user, followDto.userId));
+        return this.successResponse(await this.followService.unfollow(user, followDto.userId));
     }
 
     @Get('followings')
     async followings(@Query() data: QueryFollowingsDto, @User() user: UserEntity) {
-        const response = await this.userService.getFollowings(user, data.page, data.limit);
+        const response = await this.followService.getFollowings(user, data.page, data.limit);
         return this.successResponse(response);
     }
 
     @Get('followers')
     async followers(@Query() data: QueryFollowersDto, @User() user: UserEntity) {
-        const response = await this.userService.getFollowers(user, data.page, data.limit);
+        const response = await this.followService.getFollowers(user, data.page, data.limit);
         return this.successResponse(response);
     }
 }

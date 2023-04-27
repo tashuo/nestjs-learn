@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostEntity } from './entities/post.entity';
 import { BullModule } from '@nestjs/bull';
 import { PostRepository } from './post.repository';
-import { WsService } from '../ws/ws.service';
 
 @Module({
     imports: [

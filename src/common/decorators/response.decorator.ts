@@ -1,7 +1,6 @@
 import { applyDecorators, Type } from '@nestjs/common';
 import { ApiExtraModels, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
-import { CommonResponseDto } from 'src/modules/post/dto/common-response.dto';
-import { CustomPaginationResponse, CustomListResponse } from '../base/response.dto';
+import { CustomPaginationResponse } from '../base/response.dto';
 
 export const GenerateSwaggerResponse = <Entity extends Type<unknown>>(
     Entity: Entity,

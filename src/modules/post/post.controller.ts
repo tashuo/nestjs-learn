@@ -6,10 +6,8 @@ import {
     Patch,
     Param,
     Delete,
-    Req,
     ParseArrayPipe,
     Inject,
-    InternalServerErrorException,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -20,10 +18,9 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { User } from 'src/common/decorators/user.decorator';
 import { BaseController } from 'src/common/base/controller.base';
-import { ApiCreatedResponse, ApiExtraModels } from '@nestjs/swagger';
+import { ApiExtraModels } from '@nestjs/swagger';
 import { PostEntity } from './entities/post.entity';
 import { CommonResponseDto } from './dto/common-response.dto';
-import { PostResponseDto } from './dto/post-response.dto';
 import { Guest } from 'src/common/decorators/guest.decorator';
 
 import { GenerateSwaggerResponse } from 'src/common/decorators/response.decorator';
@@ -53,7 +50,6 @@ export class PostController extends BaseController {
     // 要验证数组，创建一个包裹了该数组的专用类，或者使用 ParseArrayPipe
     @Post('batch')
     createBatch(
-        @Req() Req,
         @Body(new ParseArrayPipe({ items: CreatePostDto })) createPostDtos: CreatePostDto[],
     ) {
         console.log(createPostDtos);
