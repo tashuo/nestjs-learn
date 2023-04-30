@@ -7,7 +7,7 @@ import { PostPublishedEvent } from 'src/modules/post/events/postPublished.event'
 import { FollowEvent } from 'src/modules/user/events/follow.event';
 import { UnfollowEvent } from 'src/modules/user/events/unfollow.event';
 
-@Processor('feeds')
+@Processor({ name: 'feeds' })
 export class FeedConsumer {
     constructor(private readonly feedService: FeedService) {}
 
@@ -17,19 +17,18 @@ export class FeedConsumer {
         if (isNil(job.data.jobType)) {
             return;
         }
-
         switch (job.data.jobType) {
             case PostPublishedEvent.name:
-                this.feedService.postPublish(job.data.postId);
+                await this.feedService.postPublish(job.data.postId);
                 break;
             case PostDeletedEvent.name:
-                this.feedService.postDelete(job.data.postId);
+                await this.feedService.postDelete(job.data.postId);
                 break;
             case FollowEvent.name:
-                this.feedService.userFollow(job.data.userId, job.data.targetUserId);
+                await this.feedService.userFollow(job.data.userId, job.data.targetUserId);
                 break;
             case UnfollowEvent.name:
-                this.feedService.userUnfollow(job.data.userId, job.data.targetUserId);
+                await this.feedService.userUnfollow(job.data.userId, job.data.targetUserId);
                 break;
             default:
                 break;

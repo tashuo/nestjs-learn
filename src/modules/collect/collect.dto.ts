@@ -1,9 +1,12 @@
 import { PartialType } from '@nestjs/swagger';
 import { IsDefined, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
+import { PaginateDto } from 'src/common/base/paginate.dto';
 
-/**
- * 收藏夹新增验证
- */
+export class QueryCollectDto extends PaginateDto {
+    @IsNumber()
+    @IsNotEmpty()
+    user: number;
+}
 export class CreateCollectDto {
     @MaxLength(25, {
         always: true,
@@ -15,23 +18,8 @@ export class CreateCollectDto {
     title!: string;
 }
 
-/**
- * 收藏夹更新验证
- */
 export class UpdateCollectDto extends PartialType(CreateCollectDto) {
     @IsDefined({ groups: ['update'], message: '收藏夹ID必须指定' })
     @IsNumber()
     id!: string;
 }
-
-export class PostCollectDto {
-    @IsNumber()
-    @IsNotEmpty()
-    post: number;
-
-    @IsNumber()
-    @IsNotEmpty()
-    collect: number;
-}
-
-export class CancelPostCollectDto extends PostCollectDto {}

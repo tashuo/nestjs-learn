@@ -66,7 +66,7 @@ export class FollowService {
     }
 
     async getFollowers(user: UserEntity, page = 1, limit = 10) {
-        const followers = await UserFollowerEntity.createQueryBuilder(UserFollowerEntity.name)
+        return await UserFollowerEntity.createQueryBuilder(UserFollowerEntity.name)
             .leftJoinAndSelect(`${UserFollowerEntity.name}.follower`, 'follower')
             .where('userId = :userId', { userId: user.id })
             .select(['follower.id', 'follower.username', 'follower.avatar'])
@@ -74,6 +74,5 @@ export class FollowService {
             .offset((page - 1) * limit)
             .limit(10)
             .getRawMany();
-        return followers;
     }
 }

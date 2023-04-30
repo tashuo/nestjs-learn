@@ -1,19 +1,8 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-    ParseArrayPipe,
-    Inject,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject } from '@nestjs/common';
+import { isNil } from 'lodash';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { User } from 'src/common/decorators/user.decorator';
@@ -22,16 +11,23 @@ import { ApiExtraModels } from '@nestjs/swagger';
 import { PostEntity } from './entities/post.entity';
 import { CommonResponseDto } from './dto/common-response.dto';
 import { Guest } from 'src/common/decorators/guest.decorator';
-
 import { GenerateSwaggerResponse } from 'src/common/decorators/response.decorator';
 import { CustomBaseResponse } from 'src/common/base/response.dto';
+import { LikeDto, UnlikeDto } from './dto/like.dto';
+import { UserEntity } from '../user/entities/user.entity';
+import { LikeService } from './like.service';
+import { CollectEntity } from '../collect/entities/collect.entity';
+import { CancelPostCollectDto, PostCollectDto } from './dto/collect.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { PostDeletedEvent } from './events/postDeleted.event';
 
 @Controller('post')
 export class PostController extends BaseController {
     constructor(
         private readonly postService: PostService,
-        @InjectQueue('default') private queue: Queue,
         @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+        private readonly likeService: LikeService,
+        protected readonly eventEmitter: EventEmitter2,
     ) {
         super();
     }
@@ -44,16 +40,6 @@ export class PostController extends BaseController {
         @Body() createPostDto: CreatePostDto,
     ): Promise<CustomBaseResponse<PostEntity>> {
         return this.successResponse(await this.postService.create(createPostDto, user));
-    }
-
-    // TypeScript 不存储泛型或接口的元数据，因此当你在 DTO 中使用它们的时候， ValidationPipe 可能不能正确验证输入数据
-    // 要验证数组，创建一个包裹了该数组的专用类，或者使用 ParseArrayPipe
-    @Post('batch')
-    createBatch(
-        @Body(new ParseArrayPipe({ items: CreatePostDto })) createPostDtos: CreatePostDto[],
-    ) {
-        console.log(createPostDtos);
-        return 'testing';
     }
 
     @GenerateSwaggerResponse(PostEntity, 'page')
@@ -71,12 +57,74 @@ export class PostController extends BaseController {
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-        return this.postService.update(+id, updatePostDto);
+    async update(
+        @Param('id') id: number,
+        @Body() updatePostDto: UpdatePostDto,
+        @User() user: UserEntity,
+    ) {
+        const post = await PostEntity.findOne({ where: { id }, relations: ['user'] });
+        if (isNil(post) || post.user.id !== user.id) {
+            return this.failedResponse();
+        }
+        return this.postService.update(post, updatePostDto);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.postService.remove(+id);
+    async remove(@Param('id') id: number, @User() user: UserEntity) {
+        const post = await PostEntity.findOne({ where: { id }, relations: ['user'] });
+        if (isNil(post) || post.user.id !== user.id) {
+            return this.failedResponse();
+        }
+        PostEntity.createQueryBuilder().softDelete().where('id = :id', { id }).execute();
+        this.eventEmitter.emit(
+            'post.delete',
+            new PostDeletedEvent({
+                userId: user.id,
+                postId: post.id,
+            }),
+        );
+        return this.successResponse();
+    }
+
+    @Post('like')
+    async like(@Body() data: LikeDto, @User() user: UserEntity) {
+        return this.successResponse(await this.likeService.like(user, data.post));
+    }
+
+    @Post('cancelLike')
+    async cancelLike(@Body() data: UnlikeDto, @User() user: UserEntity) {
+        return this.successResponse(await this.likeService.cancelLike(user.id, data.post));
+    }
+
+    @Post('collect')
+    async collect(@Body() data: PostCollectDto, @User() user: UserEntity) {
+        const collect = await CollectEntity.findOne({
+            where: { id: data.collect },
+            relations: ['user'],
+        });
+        if (isNil(collect) || collect.user.id !== user.id) {
+            return this.failedResponse();
+        }
+        const post = await PostEntity.findOneBy({ id: data.post });
+        if (isNil(post)) {
+            return this.failedResponse();
+        }
+        return this.successResponse(await this.postService.collect(post, collect, data.remark));
+    }
+
+    @Post('cancelCollect')
+    async cancelCollect(@Body() data: CancelPostCollectDto, @User() user: UserEntity) {
+        const collect = await CollectEntity.findOne({
+            where: { id: data.collect },
+            relations: ['user'],
+        });
+        if (isNil(collect) || collect.user.id !== user.id) {
+            return this.failedResponse();
+        }
+        const post = await PostEntity.findOneBy({ id: data.post });
+        if (isNil(post)) {
+            return this.failedResponse();
+        }
+        return this.successResponse(await this.postService.cancleCollect(post, collect));
     }
 }

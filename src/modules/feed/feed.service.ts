@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-
 import { isNil } from 'lodash';
 import { FollowService } from '../user/follow.service';
 import { FeedEntity } from './entities/feed.entity';
@@ -25,11 +24,17 @@ export class FeedService {
             .orderBy('publish_time', 'DESC')
             .offset((page - 1) * limit)
             .take(limit)
-            .execute();
+            .getRawMany();
+        if (feeds.length === 0) {
+            return [];
+        }
         const postIds = feeds.map((item: any) => {
             return item.post_id;
         });
-        return PostEntity.createQueryBuilder().where(`post.id IN(${postIds})`).getMany();
+        return PostEntity.createQueryBuilder()
+            .where(`id IN(${postIds})`)
+            .orderBy('id', 'DESC')
+            .getMany();
     }
 
     /**
@@ -56,11 +61,7 @@ export class FeedService {
                 publish_time: item.created_at.getTime() / 1000,
             };
         });
-        FeedEntity.createQueryBuilder(FeedEntity.name)
-            .insert()
-            .orIgnore()
-            .values(insertData)
-            .execute();
+        await FeedEntity.createQueryBuilder().insert().orIgnore().values(insertData).execute();
     }
 
     /**
@@ -69,7 +70,7 @@ export class FeedService {
      * @param targetUserId 被关注者ID
      */
     async userUnfollow(userId: number, targetUserId: number) {
-        FeedEntity.createQueryBuilder(FeedEntity.name)
+        await FeedEntity.createQueryBuilder(FeedEntity.name)
             .where('user_id = :userId', { userId })
             .where('author_id = :targetUserId', { targetUserId })
             .delete()
@@ -78,39 +79,30 @@ export class FeedService {
 
     // 被关注者发帖分发动态
     async postPublish(postId: number) {
-        console.log(`publish ${postId}`);
         const post = await PostEntity.findOne({ where: { id: postId }, relations: ['user'] });
         if (isNil(post)) {
             return;
         }
-        const insertData = [];
         for (let i = 1; ; i++) {
             const followers = await this.followService.getFollowers(post.user, i, 500);
-            if (isNil(followers)) {
+            if (followers.length === 0) {
                 break;
             }
-            insertData.push(
-                followers.map((userId) => {
-                    return {
-                        post_id: post.id,
-                        user_id: userId,
-                        author_id: post.user.id,
-                        publish_time: post.created_at.getTime() / 1000,
-                    };
-                }),
-            );
-            FeedEntity.createQueryBuilder(FeedEntity.name)
-                .insert()
-                .orIgnore()
-                .values(insertData as any)
-                .execute();
+            const insertData = followers.map((follower) => {
+                return {
+                    post_id: post.id,
+                    user_id: follower.follower_id,
+                    author_id: post.user.id,
+                    publish_time: post.created_at.getTime() / 1000,
+                };
+            });
+            await FeedEntity.createQueryBuilder().insert().orIgnore().values(insertData).execute();
         }
     }
 
     // 被关注者发帖删除动态
     async postDelete(postId: string) {
-        console.log(`delete ${postId}`);
-        FeedEntity.createQueryBuilder(FeedEntity.name)
+        await FeedEntity.createQueryBuilder(FeedEntity.name)
             .where('post_id = :postId', { postId })
             .delete()
             .execute();

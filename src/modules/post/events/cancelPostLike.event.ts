@@ -1,5 +1,9 @@
 export class CancelPostLikeEvent {
-    postId: string;
+    postId: number;
 
-    userId: string;
+    userId: number;
+
+    public constructor(init?: Partial<CancelPostLikeEvent>) {
+        Object.assign(this, init);
+    }
 }

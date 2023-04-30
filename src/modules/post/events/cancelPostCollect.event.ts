@@ -1,5 +1,9 @@
 export class CancelPostCollectEvent {
-    postId: string;
+    postId: number;
 
-    collectId: string;
+    collectId: number;
+
+    public constructor(init?: Partial<CancelPostCollectEvent>) {
+        Object.assign(this, init);
+    }
 }

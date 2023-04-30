@@ -7,8 +7,8 @@ import {
     DeleteDateColumn,
     Entity,
     Index,
-    ManyToMany,
     ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -20,6 +20,7 @@ import { PostEntity } from '../../post/entities/post.entity';
 @Exclude()
 @Entity('collects')
 export class CollectEntity extends BaseEntity {
+    @Expose()
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -32,9 +33,8 @@ export class CollectEntity extends BaseEntity {
     @Index('idx_uid')
     user: UserEntity;
 
-    @Expose()
-    @ManyToMany((type) => PostEntity, (post) => post.collects)
-    posts: PostEntity[];
+    @OneToMany(() => CollectPostEntity, (collectPost) => collectPost.collect)
+    posts: CollectPostEntity[];
 
     @Expose()
     @Column({ comment: '收藏夹名称' })
@@ -61,4 +61,29 @@ export class CollectEntity extends BaseEntity {
         comment: '删除时间',
     })
     deletedAt: Date;
+}
+
+@Entity('collect_posts')
+@Index('uniq_collect_post', ['collect', 'post'], { unique: true })
+export class CollectPostEntity extends BaseEntity {
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Expose()
+    @ManyToOne(() => CollectEntity, (collect) => collect.posts)
+    collect: CollectEntity;
+
+    @Expose()
+    @ManyToOne(() => PostEntity, (post) => post.collects)
+    post: PostEntity;
+
+    @Column({ comment: '备注' })
+    remark: string;
+
+    @Expose()
+    @Type(() => Date)
+    @CreateDateColumn({
+        comment: '创建时间',
+    })
+    createdAt: Date;
 }

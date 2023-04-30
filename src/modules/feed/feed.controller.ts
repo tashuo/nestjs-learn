@@ -3,7 +3,6 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { User } from 'src/common/decorators/user.decorator';
 import { BaseController } from 'src/common/base/controller.base';
-import { Guest } from 'src/common/decorators/guest.decorator';
 import { GenerateSwaggerResponse } from 'src/common/decorators/response.decorator';
 import { CustomBaseResponse } from 'src/common/base/response.dto';
 import { FeedService } from './feed.service';
@@ -20,8 +19,7 @@ export class FeedController extends BaseController {
     }
 
     @GenerateSwaggerResponse(PostEntity, 'page')
-    @Guest()
-    @Get()
+    @Get('list')
     async list(@User() user: UserEntity): Promise<CustomBaseResponse<PostEntity>> {
         return this.successResponse(await this.feedService.getTimelineFeeds(user.id));
     }

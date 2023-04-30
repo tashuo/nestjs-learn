@@ -1,5 +1,9 @@
 export class PostCollectEvent {
-    postId: string;
+    postId: number;
 
-    collectId: string;
+    collectId: number;
+
+    public constructor(init?: Partial<PostCollectEvent>) {
+        Object.assign(this, init);
+    }
 }

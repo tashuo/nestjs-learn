@@ -46,12 +46,12 @@
     "method": "POST",
     "sortNum": 0,
     "created": "2022-12-17T09:57:26.466Z",
-    "modified": "2023-04-13T05:33:20.242Z",
+    "modified": "2023-04-28T15:36:14.334Z",
     "headers": [],
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"username\": \"test2\",\n  \"password\": \"123456\"\n}",
+      "raw": "{\n  \"username\": \"test-1\",\n  \"password\": \"123456\"\n}",
       "form": []
     },
     "tests": []
@@ -65,11 +65,11 @@
     "method": "POST",
     "sortNum": 0,
     "created": "2022-12-17T13:53:17.126Z",
-    "modified": "2023-04-12T14:47:40.315Z",
+    "modified": "2023-04-28T15:37:18.384Z",
     "headers": [
       {
         "name": "Authorization",
-        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoxLCJpYXQiOjE2ODEzMTA3NzQsImV4cCI6MTY4MTM5NzE3NH0._4-fulL4pLo_XwCoT3kLE2voHGA3FGYEl6T6DD-q6fg"
+        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QtMSIsInN1YiI6MSwiaWF0IjoxNjgyNjk2MTc0LCJleHAiOjE2ODI3ODI1NzR9.RP5p05cXYALGzMviNWyKkWjtVcd-vrJ5ajBoyWKN4YI"
       }
     ],
     "params": [],
@@ -85,15 +85,15 @@
     "colId": "history",
     "containerId": "",
     "name": "127.0.0.1:3000/post/1",
-    "url": "127.0.0.1:3000/post/68",
-    "method": "GET",
+    "url": "127.0.0.1:3000/post/186",
+    "method": "DELETE",
     "sortNum": 0,
     "created": "2022-12-17T13:53:28.564Z",
-    "modified": "2023-03-02T07:03:11.858Z",
+    "modified": "2023-04-29T04:28:35.649Z",
     "headers": [
       {
         "name": "Authorization",
-        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoxLCJpYXQiOjE2NzcyMTE5MDQsImV4cCI6MTY3NzI5ODMwNH0.g_hiuAW-GlqLbAH8Z2ZI1Jed_6FSW_RRyNeRloJbDxI"
+        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QtMSIsInN1YiI6MSwiaWF0IjoxNjgyNjk2MTc0LCJleHAiOjE2ODI3ODI1NzR9.RP5p05cXYALGzMviNWyKkWjtVcd-vrJ5ajBoyWKN4YI"
       }
     ],
     "params": [],

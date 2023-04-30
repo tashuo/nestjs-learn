@@ -3,17 +3,12 @@ import { PostService } from './post.service';
 import { PostController } from './post.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostEntity } from './entities/post.entity';
-import { BullModule } from '@nestjs/bull';
-import { PostRepository } from './post.repository';
+import { LikeService } from './like.service';
+import { PostListener } from './post.listener';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([PostEntity]),
-        BullModule.registerQueue({
-            name: 'default',
-        }),
-    ],
+    imports: [TypeOrmModule.forFeature([PostEntity])],
     controllers: [PostController],
-    providers: [PostService, PostRepository],
+    providers: [PostService, LikeService, PostListener],
 })
 export class PostModule {}

@@ -15,7 +15,7 @@ import { BullModule } from '@nestjs/bull';
         ConfigModule.load(path.resolve(__dirname, 'config', '!(*.d).{ts,js}')),
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
-            useClass: TypeOrmConfigService, // 同useFactory,useClass不需要inject
+            useClass: TypeOrmConfigService,
         }),
         WinstonModule.forRootAsync({
             imports: [ConfigModule],
@@ -70,17 +70,26 @@ import { BullModule } from '@nestjs/bull';
             }),
             global: true,
         },
-        BullModule.forRootAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: (config: ConfigService) => ({
-                redis: {
-                    host: config.get('redis.host'),
-                    port: config.get('redis.port'),
-                    password: config.get('redis.password'),
-                },
+        {
+            ...BullModule.forRootAsync({
+                imports: [ConfigModule],
+                inject: [ConfigService],
+                useFactory: (config: ConfigService) => ({
+                    redis: {
+                        host: config.get('redis.host'),
+                        port: config.get('redis.port'),
+                        password: config.get('redis.password'),
+                    },
+                }),
             }),
-        }),
+            global: true,
+        },
+        {
+            ...BullModule.registerQueue({
+                name: 'feeds',
+            }),
+            global: true,
+        },
     ],
 })
 export class BootstrapModule {}

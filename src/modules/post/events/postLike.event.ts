@@ -1,5 +1,9 @@
 export class PostLikeEvent {
-    postId: string;
+    postId: number;
 
-    userId: string;
+    userId: number;
+
+    public constructor(init?: Partial<PostLikeEvent>) {
+        Object.assign(this, init);
+    }
 }

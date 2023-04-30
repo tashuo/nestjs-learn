@@ -6,6 +6,7 @@ import {
     OneToMany,
     ManyToMany,
     JoinTable,
+    DeleteDateColumn,
 } from 'typeorm';
 import { PostEntity } from './post.entity';
 import { PostToCategory } from './postToCategory.entity';
@@ -27,4 +28,7 @@ export class Category {
 
     @OneToMany(() => PostToCategory, (postToCategory) => postToCategory.category)
     public postToCategories: PostToCategory[];
+
+    @DeleteDateColumn()
+    deleted_at?: Date;
 }

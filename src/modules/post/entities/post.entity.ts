@@ -3,6 +3,7 @@ import {
     BaseEntity,
     Column,
     CreateDateColumn,
+    DeleteDateColumn,
     Entity,
     Index,
     JoinTable,
@@ -15,7 +16,7 @@ import {
 } from 'typeorm';
 import { PostExtraEntity } from './post_extra.entity';
 import { Tag as TagEntity } from '../../tag/entities/tag.entity';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
 import { Category } from './category.entity';
 import { PostToCategory } from './postToCategory.entity';
 
@@ -71,12 +72,44 @@ export class PostEntity extends BaseEntity {
     })
     status: STATUS;
 
+    @Expose()
+    @Type(() => Number)
+    @Column({ comment: '评论数' })
+    @Index()
+    comment_count: number;
+
+    @Expose()
+    @Type(() => Number)
+    @Column({ comment: '点赞数' })
+    @Index()
+    like_count: number;
+
+    @Expose()
+    @Type(() => Number)
+    @Column({ comment: '转发数' })
+    repost_count: number;
+
+    @Expose()
+    @Type(() => Number)
+    @Column({ comment: '收藏数' })
+    collect_count: number;
+
+    @Expose()
+    @Type(() => Number)
+    @Column({ comment: '详情页浏览数' })
+    @Index()
+    detail_count: number;
+
     @CreateDateColumn()
     created_at: Date;
 
     @Exclude()
     @UpdateDateColumn()
     updated_at: Date;
+
+    @Exclude()
+    @DeleteDateColumn()
+    deleted_at?: Date;
 
     @ManyToMany(() => TagEntity)
     @JoinTable()

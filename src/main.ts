@@ -11,7 +11,7 @@ async function bootstrap() {
     const config = app.get(ConfigService);
     app.useGlobalPipes(new ValidationPipe());
     app.useWebSocketAdapter(new AuthenticatedSocketIoAdapter(app));
-    app.init();
+    // app.init();  // 加上init会触发bull的consumer重复注册bug？
 
     await app.listen(config.get('app.port'));
 }

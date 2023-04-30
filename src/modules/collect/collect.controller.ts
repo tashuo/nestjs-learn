@@ -1,17 +1,18 @@
-import { Controller, Get, Post, Body, Param, Delete, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Inject, Query } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { User } from 'src/common/decorators/user.decorator';
-import { BaseController } from 'src/common/base/controller.base';
-import { ApiExtraModels } from '@nestjs/swagger';
-import { Guest } from 'src/common/decorators/guest.decorator';
+import { isNil } from 'lodash';
+import { User } from '../../common/decorators/user.decorator';
+import { BaseController } from '../../common/base/controller.base';
+import { Guest } from '../../common/decorators/guest.decorator';
 
-import { GenerateSwaggerResponse } from 'src/common/decorators/response.decorator';
-import { CustomBaseResponse } from 'src/common/base/response.dto';
+import { GenerateSwaggerResponse } from '../../common/decorators/response.decorator';
+import { CustomBaseResponse } from '../../common/base/response.dto';
 import { CollectService } from './collect.service';
 import { CollectEntity } from './entities/collect.entity';
-import { CreateCollectDto } from './collect.dto';
+import { CreateCollectDto, QueryCollectDto } from './collect.dto';
 import { CommonResponseDto } from '../post/dto/common-response.dto';
+import { PaginateDto } from '../../common/base/paginate.dto';
 
 @Controller('collect')
 export class CollectController extends BaseController {
@@ -22,7 +23,6 @@ export class CollectController extends BaseController {
         super();
     }
 
-    @ApiExtraModels(CollectEntity)
     @GenerateSwaggerResponse(CollectEntity, 'single')
     @Post()
     async create(
@@ -34,19 +34,40 @@ export class CollectController extends BaseController {
 
     @GenerateSwaggerResponse(CollectEntity, 'page')
     @Get()
-    async list(@User() user): Promise<CustomBaseResponse<CollectEntity>> {
-        return this.successResponse(await this.collectService.list(user));
+    @Guest()
+    async list(
+        @User() user,
+        @Query() query: QueryCollectDto,
+    ): Promise<CustomBaseResponse<CollectEntity>> {
+        const userId = query.user ? query.user : user.id;
+        if (isNil(userId)) {
+            return this.failedResponse();
+        }
+        return this.successResponse(await this.collectService.list(user, query.page, query.limit));
     }
 
     @GenerateSwaggerResponse(CollectEntity, 'single')
-    @Guest()
     @Get(':id')
-    async findOne(@Param('id') id: number): Promise<CommonResponseDto<CollectEntity>> {
-        return this.successResponse(await this.collectService.getPosts(id));
+    @Guest()
+    async findOne(
+        @Param('id') id: number,
+        @Query() query: PaginateDto,
+    ): Promise<CommonResponseDto<CollectEntity>> {
+        const collect = await CollectEntity.findOneBy({ id: id });
+        if (isNil(collect)) {
+            return this.failedResponse();
+        }
+        return this.successResponse(
+            await this.collectService.getPosts(collect, query.page, query.limit),
+        );
     }
 
     @Delete(':id')
-    remove(@Param('id') id: number) {
-        return this.successResponse(this.collectService.delete(id));
+    async remove(@Param('id') id: number, @User() user) {
+        const collect = await CollectEntity.findOneBy({ id: id });
+        if (isNil(collect) || collect.user.id !== user.id) {
+            return this.failedResponse();
+        }
+        return this.successResponse(this.collectService.delete(collect));
     }
 }

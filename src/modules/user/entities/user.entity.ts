@@ -3,6 +3,7 @@ import {
     BaseEntity,
     Column,
     CreateDateColumn,
+    DeleteDateColumn,
     Entity,
     JoinTable,
     ManyToMany,
@@ -43,6 +44,10 @@ export class UserEntity extends BaseEntity {
     @Exclude()
     @UpdateDateColumn()
     updated_at: Date;
+
+    @Exclude()
+    @DeleteDateColumn()
+    deleted_at?: Date;
 
     @OneToMany(() => PostEntity, (post) => post.user)
     posts!: PostEntity[];

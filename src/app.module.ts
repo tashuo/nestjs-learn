@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { BootstrapModule } from './bootstrap.module';
-import { DefaultConsumer } from './jobs/default.consumer';
-import { HttpException2Filter } from './common/filters/http.exception2.filter';
 import { HttpExceptionFilter } from './common/filters/http.exception.filter';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { TagModule } from './modules/tag/tag.module';
@@ -15,6 +13,23 @@ import { CollectModule } from './modules/collect/collect.module';
 import { AuthModule } from './modules/auth/auth.module';
 import * as jobs from './jobs';
 
+const providers = [];
+providers.push(
+    ...[
+        {
+            provide: APP_GUARD,
+            useClass: JwtAuthGuard,
+        },
+        {
+            provide: APP_FILTER,
+            useClass: HttpExceptionFilter,
+        },
+    ],
+);
+if (process.env.NODE_ENV != 'test') {
+    providers.push(...Object.values(jobs));
+}
+
 @Module({
     imports: [
         BootstrapModule,
@@ -24,20 +39,9 @@ import * as jobs from './jobs';
         UserModule,
         TagModule,
         WsModule,
-        FeedModule,
         CollectModule,
+        FeedModule,
     ],
-    providers: [
-        // DefaultConsumer, // 注册后才会消费
-        {
-            provide: APP_GUARD,
-            useClass: JwtAuthGuard,
-        },
-        {
-            provide: APP_FILTER,
-            useClass: HttpExceptionFilter,
-        },
-        ...Object.values(jobs),
-    ],
+    providers: providers,
 })
 export class AppModule {}

@@ -1,5 +1,9 @@
 export class PostDeletedEvent {
-    postId: string;
+    postId: number;
 
-    userId: string;
+    userId: number;
+
+    public constructor(init?: Partial<PostDeletedEvent>) {
+        Object.assign(this, init);
+    }
 }

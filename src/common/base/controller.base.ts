@@ -5,7 +5,7 @@ import { CustomBaseResponse } from './response.dto';
 @Injectable()
 @UseInterceptors(ClassSerializerInterceptor)
 export abstract class BaseController {
-    async successResponse(data: any): Promise<any> {
+    async successResponse(data?: any): Promise<any> {
         return this.response(RESPONSE_CODE_SUCCESS, data);
     }
 

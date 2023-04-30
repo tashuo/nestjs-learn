@@ -15,21 +15,18 @@ export class FeedEntity extends BaseEntity {
 
     @Column({
         comment: '帖子ID',
-        type: String,
     })
-    post_id: string;
+    post_id: number;
 
     @Column({
         comment: '楼主ID',
-        type: String,
     })
-    author_id: string;
+    author_id: number;
 
     @Column({
         comment: '用户ID',
-        type: String,
     })
-    user_id: string;
+    user_id: number;
 
     @Column({
         comment: '发布时间戳',
