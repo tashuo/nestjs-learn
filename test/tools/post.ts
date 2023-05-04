@@ -8,6 +8,7 @@ import { PostPublishedEvent } from 'src/modules/post/events/postPublished.event'
 import { Job } from 'bull';
 import { PostDeletedEvent } from 'src/modules/post/events/postDeleted.event';
 import { PostEntity } from 'src/modules/post/entities/post.entity';
+import { CommentEntity } from 'src/modules/comment/entities/comment.entity';
 
 export class PostTool {
     static info = async (app: INestApplication, loginUser: User, postId: number) => {
@@ -106,5 +107,69 @@ export class PostTool {
             .send({ post: postId, collect: collectId })
             .set('Authorization', `Bearer ${loginUser.token}`);
         expect(response.body.code).toEqual(200);
+    };
+
+    static createComment = async (
+        app: INestApplication,
+        loginUser: User,
+        postId: number,
+        parent?: CommentEntity,
+    ) => {
+        const response = await request(app.getHttpServer())
+            .post('/comment')
+            .send({
+                post: postId,
+                content: `test conente ${uniqid()}`,
+                parent: parent ? parent.id : null,
+            })
+            .set('Authorization', `Bearer ${loginUser.token}`);
+        expect(response.body.code).toEqual(200);
+        return response.body.data;
+    };
+
+    static getComments = async (
+        app: INestApplication,
+        loginUser: User,
+        postId: number,
+        page = 1,
+        limit = 10,
+    ) => {
+        const response = await request(app.getHttpServer())
+            .get('/comment')
+            .query({
+                post: postId,
+                page,
+                limit,
+            })
+            .set('Authorization', `Bearer ${loginUser.token}`);
+        expect(response.body.code).toEqual(200);
+        return response.body.data;
+    };
+
+    static getChildrenComments = async (
+        app: INestApplication,
+        loginUser: User,
+        parent: number,
+        page = 1,
+        limit = 10,
+    ) => {
+        const response = await request(app.getHttpServer())
+            .get('/comment/children')
+            .query({
+                parent,
+                page,
+                limit,
+            })
+            .set('Authorization', `Bearer ${loginUser.token}`);
+        expect(response.body.code).toEqual(200);
+        return response.body.data;
+    };
+
+    static deleteComment = async (app: INestApplication, loginUser: User, id: number) => {
+        const response = await request(app.getHttpServer())
+            .delete(`/comment/${id}`)
+            .set('Authorization', `Bearer ${loginUser.token}`);
+        expect(response.body.code).toEqual(200);
+        return response.body.data;
     };
 }
