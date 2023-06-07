@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Query } from '@nestjs/common';
 import { isNil } from 'lodash';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -20,6 +20,7 @@ import { CollectEntity } from '../collect/entities/collect.entity';
 import { CancelPostCollectDto, PostCollectDto } from './dto/collect.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PostDeletedEvent } from './events/postDeleted.event';
+import { PaginateDto } from 'src/common/base/paginate.dto';
 
 @Controller('post')
 export class PostController extends BaseController {
@@ -45,8 +46,8 @@ export class PostController extends BaseController {
     @GenerateSwaggerResponse(PostEntity, 'page')
     @Guest()
     @Get()
-    async findAll(): Promise<CustomBaseResponse<PostEntity>> {
-        return this.successResponse(await this.postService.findAll());
+    async findAll(@Query() pageDto: PaginateDto): Promise<CustomBaseResponse<PostEntity>> {
+        return this.successResponse(await this.postService.findAll(pageDto.page, pageDto.limit));
     }
 
     @GenerateSwaggerResponse(PostEntity, 'single')

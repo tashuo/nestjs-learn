@@ -15,14 +15,14 @@ import { Server } from 'socket.io';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { JwtService } from '@nestjs/jwt';
-import { SocketWithUserData, UserSocket } from './types';
+import { SocketWithUserData } from './types';
 import { Observable, of } from 'rxjs';
-import { WsAuthGuard } from 'src/common/guards/ws-auth.guard';
 import { WsService } from './ws.service';
+import { WsAuthGuard } from 'src/common/guards/ws-auth.guard';
 
 @Injectable()
-// @UseGuards(WsAuthGuard)
-@WebSocketGateway(3002, { cors: true, transports: ['websocket'] })
+@UseGuards(WsAuthGuard)
+@WebSocketGateway(3002, { cors: true, transports: ['polling', 'websocket'] })
 export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     constructor(
         @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
@@ -44,6 +44,8 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect, O
             };
             this.wsService.addUserSocket(sub, client);
         } catch (error) {
+            console.log('connection error');
+            console.log(error);
             throw new UnauthorizedException();
         }
 

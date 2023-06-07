@@ -14,14 +14,18 @@ export class AuthenticatedSocketIoAdapter extends IoAdapter {
         options.allowRequest = async (request, allowFunction) => {
             try {
                 console.log('allowRequest valid');
-                const token = request.headers.authorization.replace('Bearer ', '');
+                const token = request.headers.authorization?.replace('Bearer ', '');
                 const verified = token && (await this.jwtService.verify(token));
+                console.log(verified);
                 if (verified) {
                     return allowFunction(null, true);
                 }
             } catch (error) {
+                console.log('allowRequest error');
+                console.log(error);
                 return allowFunction('Unauthorized', false);
             }
+            return allowFunction('Unauthorized', false);
         };
 
         return super.createIOServer(port, options);

@@ -38,10 +38,12 @@ export class PostService {
         return await PostEntity.findOne({ where: { id: post.id }, relations: ['user', 'tags'] });
     }
 
-    async findAll() {
+    async findAll(page = 1, limit = 10) {
         return await PostEntity.find({
             relations: ['user', 'tags'],
             order: { id: 'DESC' },
+            skip: (page - 1) * limit,
+            take: limit,
         });
     }
 

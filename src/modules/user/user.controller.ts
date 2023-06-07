@@ -21,6 +21,7 @@ export class UserController extends BaseController {
         super();
     }
 
+    @Guest()
     @Post('register')
     async register(@Body() createDto: CreateUserDto) {
         return this.successResponse(await this.userService.register(createDto));
