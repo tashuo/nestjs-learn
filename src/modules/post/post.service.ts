@@ -39,12 +39,25 @@ export class PostService {
     }
 
     async findAll(page = 1, limit = 10) {
-        return await PostEntity.find({
-            relations: ['user', 'tags'],
-            order: { id: 'DESC' },
-            skip: (page - 1) * limit,
-            take: limit,
-        });
+        const data = await PostEntity.createQueryBuilder('post')
+            .leftJoinAndSelect('post.user', 'user')
+            .leftJoinAndSelect('post.tags', 'tags')
+            .offset((page - 1) * limit)
+            .limit(limit)
+            .getManyAndCount();
+        // 通用分页
+        return {
+            items: data[0],
+            meta: {
+                total: data[1],
+                totalPages:
+                    data[1] % limit === 0
+                        ? Math.floor(data[1] / limit)
+                        : Math.floor(data[1] / limit) + 1,
+                limit: limit,
+                nextPage: data[0].length >= limit ? page + 1 : 0,
+            },
+        };
     }
 
     async findOne(id: number) {

@@ -9,10 +9,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants/jwt';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { BullModule } from '@nestjs/bull';
+// import { ConsoleModule } from 'nestjs-console';
+import { CommandModule } from 'nestjs-command';
 
 @Module({
     imports: [
         ConfigModule.load(path.resolve(__dirname, 'config', '!(*.d).{ts,js}')),
+        CommandModule,
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
             useClass: TypeOrmConfigService,
@@ -80,6 +83,7 @@ import { BullModule } from '@nestjs/bull';
                         port: config.get('redis.port'),
                         password: config.get('redis.password'),
                     },
+                    // prefix: 'blog',
                 }),
             }),
             global: true,

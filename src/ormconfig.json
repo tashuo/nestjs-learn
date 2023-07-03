@@ -1,0 +1,23 @@
+[
+    {
+        "name": "db1",
+        "type": "mysql",
+        "host": "localhost",
+        "port": 3306,
+        "username": "root",
+        "password": "",
+        "database": "nest_blog_3",
+        "migrations": ["src/database/migrations/*.{js,ts}"],
+        "entities": ["src/modules/**/entities/*.{js,ts}"]
+    }, {
+        "name": "db2",
+        "type": "mysql",
+        "host": "localhost",
+        "port": 3306,
+        "username": "root",
+        "password": "",
+        "database": "nest_blog_2",
+        "migrations": ["src/database/migrations/*.{js,ts}"],
+        "entities": ["src/modules/**/entities/*.{js,ts}"]
+    }
+]

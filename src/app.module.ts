@@ -12,6 +12,7 @@ import { FeedModule } from './modules/feed/feed.module';
 import { CollectModule } from './modules/collect/collect.module';
 import { AuthModule } from './modules/auth/auth.module';
 import * as jobs from './jobs';
+import { GenerateMigrationCommand } from './database/commands/generate.migration.command';
 
 const providers = [];
 providers.push(
@@ -24,6 +25,7 @@ providers.push(
             provide: APP_FILTER,
             useClass: HttpExceptionFilter,
         },
+        GenerateMigrationCommand,
     ],
 );
 if (process.env.NODE_ENV != 'test') {

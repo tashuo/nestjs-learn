@@ -10,6 +10,7 @@ import { FollowDto, QueryFollowersDto, QueryFollowingsDto, UnfollowDto } from '.
 import { UserEntity } from './entities/user.entity';
 import { BaseController } from '../../common/base/controller.base';
 import { FollowService } from './follow.service';
+import { Test } from 'src/common/decorators/test.decorator';
 
 @Controller('user')
 export class UserController extends BaseController {
@@ -22,8 +23,14 @@ export class UserController extends BaseController {
     }
 
     @Guest()
+    @Test()
     @Post('register')
     async register(@Body() createDto: CreateUserDto) {
+        Test()(
+            UserController.prototype,
+            'login',
+            Object.getOwnPropertyDescriptor(UserController.prototype, 'login'),
+        );
         return this.successResponse(await this.userService.register(createDto));
     }
 

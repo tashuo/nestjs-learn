@@ -1,4 +1,4 @@
-import { Inject, Injectable, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException, UseFilters, UseGuards } from '@nestjs/common';
 import {
     ConnectedSocket,
     MessageBody,
@@ -19,8 +19,10 @@ import { SocketWithUserData } from './types';
 import { Observable, of } from 'rxjs';
 import { WsService } from './ws.service';
 import { WsAuthGuard } from 'src/common/guards/ws-auth.guard';
+import { BadRequestTransformationFilter } from './BadRequestTransformation.filter';
 
 @Injectable()
+@UseFilters(BadRequestTransformationFilter)
 @UseGuards(WsAuthGuard)
 @WebSocketGateway(3002, { cors: true, transports: ['polling', 'websocket'] })
 export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
@@ -66,7 +68,10 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect, O
     }
 
     @SubscribeMessage('chat')
-    chat(@MessageBody() data: any): Observable<WsResponse<number> | any> {
+    chat(
+        @ConnectedSocket() client: SocketWithUserData,
+        @MessageBody() data: any,
+    ): Observable<WsResponse<number> | any> {
         console.log(`send message: ${data.message}`);
         this.wsService.pushMessageToUser(data.toUserId, 'chat', data.message);
         return;

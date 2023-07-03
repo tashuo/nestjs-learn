@@ -1,4 +1,3 @@
-import { type } from 'os';
 import { Socket } from 'socket.io';
 
 // 用户信息

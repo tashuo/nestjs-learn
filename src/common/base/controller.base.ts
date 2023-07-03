@@ -1,5 +1,5 @@
 import { ClassSerializerInterceptor, Injectable, UseInterceptors } from '@nestjs/common';
-import { RESPONSE_CODE_FAILED, RESPONSE_CODE_SUCCESS } from 'src/constants/response.code';
+import { RESPONSE_CODE_FAILED, RESPONSE_CODE_SUCCESS } from '../../constants/response.code';
 import { CustomBaseResponse } from './response.dto';
 
 @Injectable()
