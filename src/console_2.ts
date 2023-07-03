@@ -12,7 +12,6 @@ async function bootstrap() {
             Array.from(((app as any).container as unknown as NestContainer).getModules()).length,
         );
         await app.select(CommandModule).get(CommandService).exec();
-        await app.init();
         await app.close();
     } catch (error) {
         console.error(error);
