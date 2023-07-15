@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Guest } from '../../common/decorators/guest.decorator';
-import { User } from '../../common/decorators/user.decorator';
+import { AuthUser } from '../../common/decorators/authUser.decorator';
 import { LocalAuthGuard } from '../../common/guards/local-auth.guard';
 import { AuthService } from '../auth/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -47,23 +47,23 @@ export class UserController extends BaseController {
     }
 
     @Post('follow')
-    async follow(@Body() followDto: FollowDto, @User() user: UserEntity) {
+    async follow(@Body() followDto: FollowDto, @AuthUser() user: UserEntity) {
         return this.successResponse(await this.followService.follow(user, followDto.userId));
     }
 
     @Post('unfollow')
-    async unfollow(@Body() followDto: UnfollowDto, @User() user: UserEntity) {
+    async unfollow(@Body() followDto: UnfollowDto, @AuthUser() user: UserEntity) {
         return this.successResponse(await this.followService.unfollow(user, followDto.userId));
     }
 
     @Get('followings')
-    async followings(@Query() data: QueryFollowingsDto, @User() user: UserEntity) {
+    async followings(@Query() data: QueryFollowingsDto, @AuthUser() user: UserEntity) {
         const response = await this.followService.getFollowings(user, data.page, data.limit);
         return this.successResponse(response);
     }
 
     @Get('followers')
-    async followers(@Query() data: QueryFollowersDto, @User() user: UserEntity) {
+    async followers(@Query() data: QueryFollowersDto, @AuthUser() user: UserEntity) {
         const response = await this.followService.getFollowers(user, data.page, data.limit);
         return this.successResponse(response);
     }

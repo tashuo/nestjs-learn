@@ -12,7 +12,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { Tag } from '../../tag/entities/tag.entity';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { UserFollowerEntity } from './follow.entity';
 
 @Entity()
@@ -69,4 +69,6 @@ export class UserEntity extends BaseEntity {
 
     @OneToMany(() => UserFollowerEntity, (follow) => follow.user)
     following_2: UserEntity[];
+
+    isFollowing = false;
 }

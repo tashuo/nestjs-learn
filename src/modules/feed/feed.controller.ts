@@ -1,7 +1,7 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { User } from 'src/common/decorators/user.decorator';
+import { AuthUser } from 'src/common/decorators/authUser.decorator';
 import { BaseController } from 'src/common/base/controller.base';
 import { GenerateSwaggerResponse } from 'src/common/decorators/response.decorator';
 import { CustomBaseResponse } from 'src/common/base/response.dto';
@@ -20,7 +20,7 @@ export class FeedController extends BaseController {
 
     @GenerateSwaggerResponse(PostEntity, 'page')
     @Get('list')
-    async list(@User() user: UserEntity): Promise<CustomBaseResponse<PostEntity>> {
+    async list(@AuthUser() user: UserEntity): Promise<CustomBaseResponse<PostEntity>> {
         return this.successResponse(await this.feedService.getTimelineFeeds(user.id));
     }
 }

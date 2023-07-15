@@ -4,16 +4,20 @@ import { Tag } from '../tag/entities/tag.entity';
 import { UserEntity } from '../user/entities/user.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { PostEntity } from './entities/post.entity';
+import { PostEntity, PostInfo } from './entities/post.entity';
 import { CollectEntity, CollectPostEntity } from '../collect/entities/collect.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PostPublishedEvent } from './events/postPublished.event';
 import { PostCollectEvent } from './events/postCollect.event';
 import { CancelPostCollectEvent } from './events/cancelPostCollect.event';
+import { LikeService } from './like.service';
 
 @Injectable()
 export class PostService {
-    constructor(protected readonly eventEmitter: EventEmitter2) {}
+    constructor(
+        protected readonly eventEmitter: EventEmitter2,
+        protected readonly likeService: LikeService,
+    ) {}
 
     async create({ tags, ...data }: CreatePostDto, user: UserEntity) {
         let postTags = [];
@@ -38,16 +42,32 @@ export class PostService {
         return await PostEntity.findOne({ where: { id: post.id }, relations: ['user', 'tags'] });
     }
 
-    async findAll(page = 1, limit = 10) {
+    async findAll(userId?: number, page = 1, limit = 10) {
         const data = await PostEntity.createQueryBuilder('post')
             .leftJoinAndSelect('post.user', 'user')
             .leftJoinAndSelect('post.tags', 'tags')
             .offset((page - 1) * limit)
             .limit(limit)
             .getManyAndCount();
+
+        let items = data[0].map((v: PostEntity) => new PostInfo(v as PostInfo));
+
+        if (userId) {
+            const likedPostIds = await this.likeService.filterLikePostIds(
+                userId,
+                items.map((v) => v.id),
+            );
+            if (likedPostIds.length > 0) {
+                items = items.map((v: PostInfo) => {
+                    v.isLiked = likedPostIds.includes(v.id);
+                    return v;
+                });
+            }
+        }
+
         // 通用分页
         return {
-            items: data[0],
+            items,
             meta: {
                 total: data[1],
                 totalPages:

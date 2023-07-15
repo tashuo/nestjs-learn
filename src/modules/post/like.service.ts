@@ -118,4 +118,14 @@ export class LikeService {
             where: { id: In(postIds) },
         });
     }
+
+    async filterLikePostIds(userId: number, postIds: number[]): Promise<number[]> {
+        return (
+            await PostLikeEntity.createQueryBuilder('post_like')
+                .select(['postId'])
+                .where('userId = userId', { userId })
+                .andWhere('postId IN (:...postIds)', { postIds })
+                .getRawMany()
+        ).map((v) => v.postId);
+    }
 }

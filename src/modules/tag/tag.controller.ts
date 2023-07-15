@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { TagService } from './tag.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
-import { User } from '../../common/decorators/user.decorator';
+import { AuthUser } from '../../common/decorators/authUser.decorator';
 import { UserEntity } from '../user/entities/user.entity';
 import { BaseController } from '../../common/base/controller.base';
 
@@ -13,7 +13,7 @@ export class TagController extends BaseController {
     }
 
     @Post()
-    async create(@Body() createTagDto: CreateTagDto, @User() user: UserEntity) {
+    async create(@Body() createTagDto: CreateTagDto, @AuthUser() user: UserEntity) {
         return this.successResponse(await this.tagService.create(createTagDto, user));
     }
 
@@ -28,12 +28,12 @@ export class TagController extends BaseController {
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() updateTagDto: UpdateTagDto, @User() user: UserEntity) {
+    update(@Param('id') id: string, @Body() updateTagDto: UpdateTagDto, @AuthUser() user: UserEntity) {
         return this.tagService.update(id, updateTagDto, user);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string, @User() user: UserEntity) {
+    remove(@Param('id') id: string, @AuthUser() user: UserEntity) {
         return this.tagService.remove(id, user);
     }
 }

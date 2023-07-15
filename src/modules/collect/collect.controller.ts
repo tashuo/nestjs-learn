@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, Delete, Inject, Query } from '@nest
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { isNil } from 'lodash';
-import { User } from '../../common/decorators/user.decorator';
+import { AuthUser } from '../../common/decorators/authUser.decorator';
 import { BaseController } from '../../common/base/controller.base';
 import { Guest } from '../../common/decorators/guest.decorator';
 
@@ -26,7 +26,7 @@ export class CollectController extends BaseController {
     @GenerateSwaggerResponse(CollectEntity, 'single')
     @Post()
     async create(
-        @User() user,
+        @AuthUser() user,
         @Body() createCollectDto: CreateCollectDto,
     ): Promise<CustomBaseResponse<CollectEntity>> {
         return this.successResponse(await this.collectService.create(user, createCollectDto.title));
@@ -36,7 +36,7 @@ export class CollectController extends BaseController {
     @Get()
     @Guest()
     async list(
-        @User() user,
+        @AuthUser() user,
         @Query() query: QueryCollectDto,
     ): Promise<CustomBaseResponse<CollectEntity>> {
         const userId = query.user ? query.user : user.id;
@@ -63,7 +63,7 @@ export class CollectController extends BaseController {
     }
 
     @Delete(':id')
-    async remove(@Param('id') id: number, @User() user) {
+    async remove(@Param('id') id: number, @AuthUser() user) {
         const collect = await CollectEntity.findOneBy({ id: id });
         if (isNil(collect) || collect.user.id !== user.id) {
             return this.failedResponse();

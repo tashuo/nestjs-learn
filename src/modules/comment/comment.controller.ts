@@ -3,7 +3,7 @@ import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { BaseController } from '../../common/base/controller.base';
-import { User } from '../../common/decorators/user.decorator';
+import { AuthUser } from '../../common/decorators/authUser.decorator';
 import { UserEntity } from '../user/entities/user.entity';
 import { CommentEntity } from './entities/comment.entity';
 import { isNil } from 'lodash';
@@ -17,7 +17,7 @@ export class CommentController extends BaseController {
     }
 
     @Post()
-    async create(@Body() createCommentDto: CreateCommentDto, @User() user: UserEntity) {
+    async create(@Body() createCommentDto: CreateCommentDto, @AuthUser() user: UserEntity) {
         const post = await PostEntity.findOneBy({ id: createCommentDto.post });
         if (isNil(post)) {
             return this.failedResponse();
@@ -31,7 +31,7 @@ export class CommentController extends BaseController {
     }
 
     @Get()
-    async findAll(@Query() queryDto: QueryPostCommentDto, @User() user: UserEntity) {
+    async findAll(@Query() queryDto: QueryPostCommentDto, @AuthUser() user: UserEntity) {
         const post = await PostEntity.findOneBy({ id: queryDto.post });
         if (isNil(post)) {
             return this.failedResponse();
@@ -42,7 +42,7 @@ export class CommentController extends BaseController {
     }
 
     @Get('children')
-    async getChildren(@Query() queryDto: QueryChildrenCommentDto, @User() user: UserEntity) {
+    async getChildren(@Query() queryDto: QueryChildrenCommentDto, @AuthUser() user: UserEntity) {
         const parent = await CommentEntity.findOneBy({ id: queryDto.parent });
         if (isNil(parent)) {
             return this.failedResponse();
@@ -58,7 +58,7 @@ export class CommentController extends BaseController {
     }
 
     @Delete(':id')
-    async remove(@Param('id') id: number, @User() user: UserEntity) {
+    async remove(@Param('id') id: number, @AuthUser() user: UserEntity) {
         const comment = await CommentEntity.findOne({ where: { id }, relations: ['user', 'post'] });
         if (isNil(comment) || comment.user.id !== user.id) {
             return this.failedResponse();

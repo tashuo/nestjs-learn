@@ -39,12 +39,12 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect, O
     async handleConnection(client: SocketWithUserData) {
         try {
             const token = client.handshake.headers.authorization.replace('Bearer ', '');
-            const { sub } = await this.jwtService.decode(token);
+            const { userId } = (await this.jwtService.decode(token)) as any;
             client.user = {
-                id: sub,
+                id: userId,
                 lastActiveTime: client.handshake.issued,
             };
-            this.wsService.addUserSocket(sub, client);
+            this.wsService.addUserSocket(userId, client);
         } catch (error) {
             console.log('connection error');
             console.log(error);

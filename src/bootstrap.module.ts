@@ -10,7 +10,7 @@ import { jwtConstants } from './constants/jwt';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { BullModule } from '@nestjs/bull';
 // import { ConsoleModule } from 'nestjs-console';
-import { CommandModule } from 'nestjs-command';
+import { CommandModule } from 'nest-commands';
 
 @Module({
     imports: [

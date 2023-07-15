@@ -1,19 +1,19 @@
-import { BootstrapConsole } from 'nestjs-console';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { CommandModule, CommandService } from 'nest-commands';
 
-const bootstrap = new BootstrapConsole({
-    module: AppModule,
-    useDecorators: true,
-});
-
-bootstrap.init().then(async (app) => {
+async function bootstrap() {
     try {
-        await app.init();
-        await bootstrap.boot();
+        const app = await NestFactory.createApplicationContext(AppModule, {
+            // logger: ['debug'],
+            logger: false,
+        });
+        await app.select(CommandModule).get(CommandService).init().exec();
         await app.close();
-    } catch (e) {
-        console.log(e);
-        await app.close();
-        process.exit(1);
+    } catch (error) {
+        console.error(error);
     }
-});
+    process.exit(1);
+}
+
+bootstrap();

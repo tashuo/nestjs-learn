@@ -38,7 +38,6 @@ export class PostEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Expose()
     @ManyToOne(() => UserEntity, (user) => user.posts, {
         nullable: false,
         onDelete: 'CASCADE',
@@ -72,29 +71,24 @@ export class PostEntity extends BaseEntity {
     })
     status: STATUS;
 
-    @Expose()
     @Type(() => Number)
     @Column({ comment: '评论数' })
     @Index()
     comment_count: number;
 
-    @Expose()
     @Type(() => Number)
     @Column({ comment: '点赞数' })
     @Index()
     like_count: number;
 
-    @Expose()
     @Type(() => Number)
     @Column({ comment: '转发数' })
     repost_count: number;
 
-    @Expose()
     @Type(() => Number)
     @Column({ comment: '收藏数' })
     collect_count: number;
 
-    @Expose()
     @Type(() => Number)
     @Column({ comment: '详情页浏览数' })
     @Index()
@@ -123,4 +117,13 @@ export class PostEntity extends BaseEntity {
 
     @OneToMany(() => PostToCategory, (postToCategory) => postToCategory.post)
     postToCategories: PostToCategory[];
+}
+
+export class PostInfo extends PostEntity {
+    isLiked = false;
+
+    constructor(data: Partial<PostInfo>) {
+        super();
+        Object.assign(this, data);
+    }
 }

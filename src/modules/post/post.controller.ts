@@ -1,11 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Query } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    Inject,
+    Query,
+    Req,
+} from '@nestjs/common';
 import { isNil } from 'lodash';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { User } from 'src/common/decorators/user.decorator';
+import { AuthUser } from 'src/common/decorators/authUser.decorator';
 import { BaseController } from 'src/common/base/controller.base';
 import { ApiExtraModels } from '@nestjs/swagger';
 import { PostEntity } from './entities/post.entity';
@@ -21,6 +32,9 @@ import { CancelPostCollectDto, PostCollectDto } from './dto/collect.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PostDeletedEvent } from './events/postDeleted.event';
 import { PaginateDto } from 'src/common/base/paginate.dto';
+import { ExtractJwt } from 'passport-jwt';
+import { JwtService } from '@nestjs/jwt';
+import { IAuthUser } from 'src/interfaces/auth';
 
 @Controller('post')
 export class PostController extends BaseController {
@@ -29,6 +43,7 @@ export class PostController extends BaseController {
         @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
         private readonly likeService: LikeService,
         protected readonly eventEmitter: EventEmitter2,
+        protected readonly jwtService: JwtService,
     ) {
         super();
     }
@@ -37,7 +52,7 @@ export class PostController extends BaseController {
     @GenerateSwaggerResponse(PostEntity, 'single')
     @Post()
     async create(
-        @User() user,
+        @AuthUser() user,
         @Body() createPostDto: CreatePostDto,
     ): Promise<CustomBaseResponse<PostEntity>> {
         return this.successResponse(await this.postService.create(createPostDto, user));
@@ -46,8 +61,20 @@ export class PostController extends BaseController {
     @GenerateSwaggerResponse(PostEntity, 'page')
     @Guest()
     @Get()
-    async findAll(@Query() pageDto: PaginateDto): Promise<CustomBaseResponse<PostEntity>> {
-        return this.successResponse(await this.postService.findAll(pageDto.page, pageDto.limit));
+    async findAll(
+        @Query() pageDto: PaginateDto,
+        @Req() request: any,
+    ): Promise<CustomBaseResponse<PostEntity>> {
+        const requestToken = ExtractJwt.fromAuthHeaderAsBearerToken()(request) as string;
+        const decodeToken = this.jwtService.decode(requestToken);
+        console.log(decodeToken);
+        return this.successResponse(
+            await this.postService.findAll(
+                (decodeToken as any)?.userId,
+                pageDto.page,
+                pageDto.limit,
+            ),
+        );
     }
 
     @GenerateSwaggerResponse(PostEntity, 'single')
@@ -61,26 +88,26 @@ export class PostController extends BaseController {
     async update(
         @Param('id') id: number,
         @Body() updatePostDto: UpdatePostDto,
-        @User() user: UserEntity,
+        @AuthUser() user: IAuthUser,
     ) {
         const post = await PostEntity.findOne({ where: { id }, relations: ['user'] });
-        if (isNil(post) || post.user.id !== user.id) {
+        if (isNil(post) || post.user.id !== user.userId) {
             return this.failedResponse();
         }
         return this.postService.update(post, updatePostDto);
     }
 
     @Delete(':id')
-    async remove(@Param('id') id: number, @User() user: UserEntity) {
+    async remove(@Param('id') id: number, @AuthUser() user: IAuthUser) {
         const post = await PostEntity.findOne({ where: { id }, relations: ['user'] });
-        if (isNil(post) || post.user.id !== user.id) {
+        if (isNil(post) || post.user.id !== user.userId) {
             return this.failedResponse();
         }
         PostEntity.createQueryBuilder().softDelete().where('id = :id', { id }).execute();
         this.eventEmitter.emit(
             'post.delete',
             new PostDeletedEvent({
-                userId: user.id,
+                userId: user.userId,
                 postId: post.id,
             }),
         );
@@ -88,22 +115,26 @@ export class PostController extends BaseController {
     }
 
     @Post('like')
-    async like(@Body() data: LikeDto, @User() user: UserEntity) {
-        return this.successResponse(await this.likeService.like(user, data.post));
+    async like(@Body() data: LikeDto, @AuthUser() user: IAuthUser) {
+        console.log(user);
+        return this.successResponse(
+            await this.likeService.like(await UserEntity.findOneBy({ id: user.userId }), data.post),
+        );
     }
 
     @Post('cancelLike')
-    async cancelLike(@Body() data: UnlikeDto, @User() user: UserEntity) {
-        return this.successResponse(await this.likeService.cancelLike(user.id, data.post));
+    async cancelLike(@Body() data: UnlikeDto, @AuthUser() user: IAuthUser) {
+        console.log(user);
+        return this.successResponse(await this.likeService.cancelLike(user.userId, data.post));
     }
 
     @Post('collect')
-    async collect(@Body() data: PostCollectDto, @User() user: UserEntity) {
+    async collect(@Body() data: PostCollectDto, @AuthUser() user: IAuthUser) {
         const collect = await CollectEntity.findOne({
             where: { id: data.collect },
             relations: ['user'],
         });
-        if (isNil(collect) || collect.user.id !== user.id) {
+        if (isNil(collect) || collect.user.id !== user.userId) {
             return this.failedResponse();
         }
         const post = await PostEntity.findOneBy({ id: data.post });
@@ -114,12 +145,12 @@ export class PostController extends BaseController {
     }
 
     @Post('cancelCollect')
-    async cancelCollect(@Body() data: CancelPostCollectDto, @User() user: UserEntity) {
+    async cancelCollect(@Body() data: CancelPostCollectDto, @AuthUser() user: IAuthUser) {
         const collect = await CollectEntity.findOne({
             where: { id: data.collect },
             relations: ['user'],
         });
-        if (isNil(collect) || collect.user.id !== user.id) {
+        if (isNil(collect) || collect.user.id !== user.userId) {
             return this.failedResponse();
         }
         const post = await PostEntity.findOneBy({ id: data.post });
