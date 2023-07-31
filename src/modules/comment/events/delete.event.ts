@@ -3,6 +3,8 @@ export class CommentDeleteEvent {
 
     commentId: number;
 
+    rootCommentId: number;
+
     public constructor(init?: Partial<CommentDeleteEvent>) {
         Object.assign(this, init);
     }

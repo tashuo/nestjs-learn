@@ -9,9 +9,19 @@ import * as bcrypt from 'bcrypt';
 import { FollowService } from './follow.service';
 import { UserCommand } from './user.command';
 import { TestCommand } from './test.command';
+import { LikeService } from '../post/like.service';
+import { CollectService } from '../collect/collect.service';
 
 @Module({
-    providers: [UserService, AuthService, FollowService, UserCommand, TestCommand],
+    providers: [
+        UserService,
+        AuthService,
+        FollowService,
+        UserCommand,
+        TestCommand,
+        LikeService,
+        CollectService,
+    ],
     controllers: [UserController],
     imports: [TypeOrmModule.forFeature([UserEntity, UserFollowerEntity])],
     exports: [UserService, FollowService],

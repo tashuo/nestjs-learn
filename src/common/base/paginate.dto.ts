@@ -7,11 +7,19 @@ export class PaginateDto {
     @IsNumber()
     @Transform(({ value }) => toNumber(value))
     @Min(1, { message: 'must larger than 0' })
-    page = 1;
+    page?: number = 1;
+
+    /**
+     * 游标，暂时只处理数字主键
+     */
+    @IsOptional()
+    @IsNumber()
+    @Transform(({ value }) => toNumber(value))
+    cursor?: number = 0;
 
     @IsOptional()
     @IsNumber()
     @Transform(({ value }) => toNumber(value))
     @Min(1, { message: 'must larger than 0' })
-    limit = 10;
+    limit?: number = 10;
 }

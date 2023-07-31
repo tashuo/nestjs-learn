@@ -53,11 +53,11 @@ export class FollowService {
         return result.affected === 1;
     }
 
-    async getFollowings(user: UserEntity, page = 1, limit = 10) {
+    async getFollowings(followerId: number, page = 1, limit = 10) {
         const followings = await UserFollowerEntity.createQueryBuilder(UserFollowerEntity.name)
             .leftJoinAndSelect(`${UserFollowerEntity.name}.user`, 'user')
-            .where('followerId = :followerId', { followerId: user.id })
-            .select(['user.id', 'user.username', 'user.avatar'])
+            .where('followerId = :followerId', { followerId })
+            .select(['user.id', 'user.username', 'user.avatar_path'])
             .orderBy(`${UserFollowerEntity.name}.id`, 'DESC')
             .offset((page - 1) * limit)
             .limit(10)
@@ -65,14 +65,33 @@ export class FollowService {
         return followings;
     }
 
-    async getFollowers(user: UserEntity, page = 1, limit = 10) {
+    async getFollowers(userId: number, page = 1, limit = 10) {
         return await UserFollowerEntity.createQueryBuilder(UserFollowerEntity.name)
             .leftJoinAndSelect(`${UserFollowerEntity.name}.follower`, 'follower')
-            .where('userId = :userId', { userId: user.id })
-            .select(['follower.id', 'follower.username', 'follower.avatar'])
+            .where('userId = :userId', { userId })
+            .select(['follower.id', 'follower.username', 'follower.avatar_path'])
             .orderBy(`${UserFollowerEntity.name}.id`, 'DESC')
             .offset((page - 1) * limit)
             .limit(10)
             .getRawMany();
+    }
+
+    async getFollowingsCount(userId: number): Promise<number> {
+        return UserFollowerEntity.createQueryBuilder()
+            .where('followerId = :userId', { userId })
+            .getCount();
+    }
+
+    async getFollowersCount(userId: number): Promise<number> {
+        return UserFollowerEntity.createQueryBuilder()
+            .where('userId = :userId', { userId })
+            .getCount();
+    }
+
+    async isFollowing(followerId: number, userId: number): Promise<boolean> {
+        return UserFollowerEntity.createQueryBuilder()
+            .where('userId = :userId', { userId })
+            .andWhere('followerId = :followerId', { followerId })
+            .getExists();
     }
 }

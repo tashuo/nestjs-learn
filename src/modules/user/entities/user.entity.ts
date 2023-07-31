@@ -1,5 +1,6 @@
 import { PostEntity } from '../../post/entities/post.entity';
 import {
+    AfterLoad,
     BaseEntity,
     Column,
     CreateDateColumn,
@@ -14,6 +15,19 @@ import {
 import { Tag } from '../../tag/entities/tag.entity';
 import { Exclude, Expose } from 'class-transformer';
 import { UserFollowerEntity } from './follow.entity';
+import { getLocalFileDomain } from '../../../utils/helper';
+
+class InteractionInfo {
+    isFollowing? = false;
+
+    followingCount = 0;
+
+    followerCount = 0;
+
+    receivedLikeCount = 0;
+
+    receivedCollectCount = 0;
+}
 
 @Entity()
 export class UserEntity extends BaseEntity {
@@ -30,8 +44,18 @@ export class UserEntity extends BaseEntity {
     @Column()
     nickname: string;
 
-    @Column()
-    avatar: string;
+    @Exclude()
+    @Column({ default: '' })
+    avatar_path: string;
+
+    @Expose()
+    avatar_url: string;
+
+    @Column({ default: '未知' })
+    gender: string;
+
+    @Column({ default: '' })
+    description: string;
 
     @Exclude()
     @Column()
@@ -70,5 +94,13 @@ export class UserEntity extends BaseEntity {
     @OneToMany(() => UserFollowerEntity, (follow) => follow.user)
     following_2: UserEntity[];
 
-    isFollowing = false;
+    @Expose({ groups: ['user-detail'] })
+    interactionInfo: InteractionInfo;
+
+    @AfterLoad()
+    convertAvatarUrl() {
+        return (this.avatar_url = this.avatar_path
+            ? `${getLocalFileDomain()}${this.avatar_path}`
+            : 'https://mui.com/static/images/avatar/4.jpg');
+    }
 }

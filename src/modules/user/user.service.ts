@@ -4,9 +4,18 @@ import { UserEntity } from './entities/user.entity';
 import { LoginDto } from './dto/login.dto';
 import { isNil } from 'lodash';
 import * as bcrypt from 'bcrypt';
+import { FollowService } from './follow.service';
+import { LikeService } from '../post/like.service';
+import { CollectService } from '../collect/collect.service';
 
 @Injectable()
 export class UserService {
+    constructor(
+        private readonly followService: FollowService,
+        private readonly likeService: LikeService,
+        private readonly collectService: CollectService,
+    ) {}
+
     async findByName(username: string) {
         return await UserEntity.findBy({ username: username });
     }
@@ -33,10 +42,21 @@ export class UserService {
         }
     }
 
-    async detail(userId: number) {
-        return await UserEntity.findOne({
-            where: { id: userId },
-            relations: ['followers', 'followers_2'],
-        });
+    async detail(userId: number, loginUserId: number | null = null): Promise<UserEntity> {
+        const user = await UserEntity.findOneBy({ id: userId });
+        if (isNil(user)) {
+            throw new Error(`userId(${userId}) not exists`);
+        }
+
+        user.interactionInfo = {
+            isFollowing:
+                !isNil(loginUserId) && (await this.followService.isFollowing(loginUserId, userId)),
+            followingCount: await this.followService.getFollowingsCount(userId),
+            followerCount: await this.followService.getFollowersCount(userId),
+            receivedLikeCount: await this.likeService.getUserReceivedLikeCount(userId),
+            receivedCollectCount: await this.collectService.getUserReceivedCollectCount(userId),
+        };
+
+        return user;
     }
 }

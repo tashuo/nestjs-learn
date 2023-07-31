@@ -13,7 +13,12 @@ import { CollectEntity } from './entities/collect.entity';
 import { CreateCollectDto, QueryCollectDto } from './collect.dto';
 import { CommonResponseDto } from '../post/dto/common-response.dto';
 import { PaginateDto } from '../../common/base/paginate.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { IAuthUser } from 'src/interfaces/auth';
+import { UserEntity } from '../user/entities/user.entity';
 
+@ApiBearerAuth()
+@ApiTags('收藏夹')
 @Controller('collect')
 export class CollectController extends BaseController {
     constructor(
@@ -26,24 +31,35 @@ export class CollectController extends BaseController {
     @GenerateSwaggerResponse(CollectEntity, 'single')
     @Post()
     async create(
-        @AuthUser() user,
+        @AuthUser() user: IAuthUser,
         @Body() createCollectDto: CreateCollectDto,
     ): Promise<CustomBaseResponse<CollectEntity>> {
-        return this.successResponse(await this.collectService.create(user, createCollectDto.title));
+        return this.successResponse(
+            await this.collectService.create(
+                await UserEntity.findOneBy({ id: user.userId }),
+                createCollectDto.title,
+            ),
+        );
     }
 
     @GenerateSwaggerResponse(CollectEntity, 'page')
     @Get()
     @Guest()
     async list(
-        @AuthUser() user,
+        @AuthUser() user: IAuthUser,
         @Query() query: QueryCollectDto,
     ): Promise<CustomBaseResponse<CollectEntity>> {
-        const userId = query.user ? query.user : user.id;
+        const userId = query.user ? query.user : user.userId;
         if (isNil(userId)) {
             return this.failedResponse();
         }
-        return this.successResponse(await this.collectService.list(user, query.page, query.limit));
+        return this.successResponse(
+            await this.collectService.list(
+                await UserEntity.findOneBy({ id: user.userId }),
+                query.page,
+                query.limit,
+            ),
+        );
     }
 
     @GenerateSwaggerResponse(CollectEntity, 'single')
@@ -63,9 +79,9 @@ export class CollectController extends BaseController {
     }
 
     @Delete(':id')
-    async remove(@Param('id') id: number, @AuthUser() user) {
+    async remove(@Param('id') id: number, @AuthUser() user: IAuthUser) {
         const collect = await CollectEntity.findOneBy({ id: id });
-        if (isNil(collect) || collect.user.id !== user.id) {
+        if (isNil(collect) || collect.user.id !== user.userId) {
             return this.failedResponse();
         }
         return this.successResponse(this.collectService.delete(collect));

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { In } from 'typeorm';
+import { BaseEntity, In, ObjectLiteral } from 'typeorm';
 import { Tag } from '../tag/entities/tag.entity';
 import { UserEntity } from '../user/entities/user.entity';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -11,6 +11,8 @@ import { PostPublishedEvent } from './events/postPublished.event';
 import { PostCollectEvent } from './events/postCollect.event';
 import { CancelPostCollectEvent } from './events/cancelPostCollect.event';
 import { LikeService } from './like.service';
+import { PostLikeEntity } from './entities/like.entity';
+import { convertToPaginationResponse } from 'src/utils/helper';
 
 @Injectable()
 export class PostService {
@@ -19,13 +21,15 @@ export class PostService {
         protected readonly likeService: LikeService,
     ) {}
 
-    async create({ tags, ...data }: CreatePostDto, user: UserEntity) {
+    async create({ tags, images, ...data }: CreatePostDto, user: UserEntity) {
         let postTags = [];
         if (tags) {
             postTags = await Tag.find({ where: { id: In(tags) } });
         }
+        const image_paths = images ? images.join(',') : '';
         const post = await PostEntity.save({
             ...data,
+            image_paths,
             user: user,
             tags: postTags,
         } as any);
@@ -42,42 +46,67 @@ export class PostService {
         return await PostEntity.findOne({ where: { id: post.id }, relations: ['user', 'tags'] });
     }
 
-    async findAll(userId?: number, page = 1, limit = 10) {
-        const data = await PostEntity.createQueryBuilder('post')
+    async findAll(loginUserId?: number, page = 1, limit = 10, anchorUserId: number | null = null) {
+        const query = PostEntity.createQueryBuilder('post')
             .leftJoinAndSelect('post.user', 'user')
             .leftJoinAndSelect('post.tags', 'tags')
+            .orderBy('post.id', 'DESC')
             .offset((page - 1) * limit)
-            .limit(limit)
-            .getManyAndCount();
-
-        let items = data[0].map((v: PostEntity) => new PostInfo(v as PostInfo));
-
-        if (userId) {
-            const likedPostIds = await this.likeService.filterLikePostIds(
-                userId,
-                items.map((v) => v.id),
-            );
-            if (likedPostIds.length > 0) {
-                items = items.map((v: PostInfo) => {
-                    v.isLiked = likedPostIds.includes(v.id);
-                    return v;
-                });
-            }
+            .limit(limit);
+        if (anchorUserId) {
+            query.where('post.userId = :anchorUserId', { anchorUserId });
         }
+        const data = await query.getManyAndCount();
 
-        // 通用分页
-        return {
-            items,
-            meta: {
-                total: data[1],
-                totalPages:
-                    data[1] % limit === 0
-                        ? Math.floor(data[1] / limit)
-                        : Math.floor(data[1] / limit) + 1,
-                limit: limit,
-                nextPage: data[0].length >= limit ? page + 1 : 0,
-            },
-        };
+        return convertToPaginationResponse(
+            { page, limit },
+            await this.renderPostInfo(data[0], loginUserId),
+            data[1],
+        );
+    }
+
+    async getLikePosts(userId: number, loginUserId?: number, page = 1, limit = 10) {
+        const query = PostLikeEntity.createQueryBuilder('like_post')
+            .leftJoinAndSelect('like_post.post', 'post')
+            .leftJoinAndSelect('post.user', 'user')
+            .where('like_post.userId = :userId', { userId })
+            .orderBy('like_post.id', 'DESC')
+            .offset((page - 1) * limit)
+            .limit(limit);
+        const data = await query.getManyAndCount();
+
+        return convertToPaginationResponse(
+            { page, limit },
+            await this.renderPostInfoV2(data[0], loginUserId),
+            data[1],
+        );
+    }
+
+    async getCollectPosts(
+        userId: number,
+        collectId?: number,
+        loginUserId?: number,
+        page = 1,
+        limit = 10,
+    ) {
+        const query = CollectPostEntity.createQueryBuilder('collect_post')
+            .leftJoinAndSelect('collect_post.collect', 'collect')
+            .leftJoinAndSelect('collect_post.post', 'post')
+            .leftJoinAndSelect('post.user', 'user')
+            .where('collect.userId = :userId', { userId })
+            .orderBy('collect_post.id', 'DESC')
+            .skip((page - 1) * limit)
+            .take(limit);
+        if (collectId) {
+            query.andWhere('collect.id = :collectId', { collectId });
+        }
+        const data = await query.getManyAndCount();
+
+        return convertToPaginationResponse(
+            { page, limit },
+            await this.renderPostInfoV2<CollectPostEntity>(data[0], loginUserId),
+            data[1],
+        );
     }
 
     async findOne(id: number) {
@@ -90,7 +119,6 @@ export class PostService {
     async update(post: PostEntity, updatePostDto: UpdatePostDto) {
         post.title = updatePostDto.title;
         post.content = updatePostDto.content;
-        post.content_type = updatePostDto.content_type;
         await post.save();
     }
 
@@ -137,5 +165,36 @@ export class PostService {
                 }),
             );
         }
+    }
+
+    async renderPostInfo(posts: PostEntity[], userId?: number): Promise<PostInfo[]> {
+        const userLikedPostIds = userId
+            ? await this.likeService.filterLikePostIds(
+                  userId,
+                  posts.map((v: PostEntity) => v.id),
+              )
+            : [];
+        return posts.map(
+            (v: PostEntity) => new PostInfo({ ...v, isLiked: userLikedPostIds.includes(v.id) }),
+        );
+    }
+
+    async renderPostInfoV2<T extends ObjectLiteral & { post: PostEntity }>(
+        posts: T[],
+        userId?: number,
+    ): Promise<T[]> {
+        if (posts.length === 0) {
+            return posts;
+        }
+        const userLikedPostIds = userId
+            ? await this.likeService.filterLikePostIds(
+                  userId,
+                  posts.map((v: T) => v.post.id),
+              )
+            : [];
+        return posts.map((v: T) => {
+            v.post = new PostInfo({ ...v.post, isLiked: userLikedPostIds.includes(v.post.id) });
+            return v;
+        });
     }
 }

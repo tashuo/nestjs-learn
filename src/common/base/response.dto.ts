@@ -1,5 +1,6 @@
 import {
     ICustomBaseResponse,
+    ICustomCursorPaginationData,
     ICustomListResponse,
     ICustomNormalResponse,
     ICustomPaginationData,
@@ -28,7 +29,7 @@ export class CustomBaseResponse<T> implements ICustomBaseResponse<T> {
     /**
      * response data
      */
-    data?: T | T[] | ICustomPaginationData<T>;
+    data?: T | T[] | ICustomPaginationData<T> | ICustomCursorPaginationData<T>;
 
     constructor(code: number, message = '', data: T, timestamp = new Date()) {
         this.code = code;

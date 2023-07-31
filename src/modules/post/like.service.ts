@@ -7,6 +7,10 @@ import { PostLikeEntity } from './entities/like.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PostLikeEvent } from './events/postLike.event';
 import { CancelPostLikeEvent } from './events/cancelPostLike.event';
+import { CommentEntity } from '../comment/entities/comment.entity';
+import { CommentLikeEntity } from '../comment/entities/like.entity';
+import { CommentLikeEvent } from '../comment/events/commentLike.event';
+import { CancelCommentLikeEvent } from '../comment/events/cancelCommentLike.event';
 
 /**
  * 点赞
@@ -69,6 +73,60 @@ export class LikeService {
     }
 
     /**
+     * 点赞
+     * @param user 用户
+     * @param commentId 帖子ID
+     */
+    async likeComment(user: UserEntity, commentId: number): Promise<boolean> {
+        const comment = await CommentEntity.findOneBy({ id: commentId });
+        if (isNil(comment)) {
+            return false;
+        }
+        const result = await CommentLikeEntity.createQueryBuilder()
+            .insert()
+            .orIgnore()
+            .updateEntity(false)
+            .values({
+                user,
+                comment,
+            })
+            .execute();
+        if (result.raw.affectedRows === 1) {
+            this.eventEmitter.emit(
+                'comment.like',
+                new CommentLikeEvent({
+                    userId: user.id,
+                    commentId,
+                }),
+            );
+        }
+        return result.raw.affectedRows === 1;
+    }
+
+    /**
+     * 取消点赞
+     * @param userId 用户ID
+     * @param commentId 帖子ID
+     */
+    async cancelLikeComment(userId: number, commentId: number) {
+        const result = await CommentLikeEntity.createQueryBuilder(CommentLikeEntity.name)
+            .where('userId = :userId AND commentId = :commentId', { userId, commentId })
+            .delete()
+            .execute();
+        if (result.affected === 1) {
+            this.eventEmitter.emit(
+                'comment.cancelLike',
+                new CancelCommentLikeEvent({
+                    userId,
+                    commentId,
+                }),
+            );
+        }
+
+        return result.affected === 1;
+    }
+
+    /**
      * 获取帖子点赞的用户列表
      * @param postId 帖子ID
      * @param page 页码
@@ -120,12 +178,33 @@ export class LikeService {
     }
 
     async filterLikePostIds(userId: number, postIds: number[]): Promise<number[]> {
-        return (
-            await PostLikeEntity.createQueryBuilder('post_like')
-                .select(['postId'])
-                .where('userId = userId', { userId })
-                .andWhere('postId IN (:...postIds)', { postIds })
-                .getRawMany()
-        ).map((v) => v.postId);
+        return postIds.length > 0
+            ? (
+                  await PostLikeEntity.createQueryBuilder('post_like')
+                      .select(['postId'])
+                      .where('userId = :userId', { userId })
+                      .andWhere('postId IN (:...postIds)', { postIds })
+                      .getRawMany()
+              ).map((v) => v.postId)
+            : [];
+    }
+
+    async filterLikeCommentIds(userId: number, commentIds: number[]): Promise<number[]> {
+        return commentIds.length > 0
+            ? (
+                  await CommentLikeEntity.createQueryBuilder('comment_like')
+                      .select(['commentId'])
+                      .where('userId = :userId', { userId })
+                      .andWhere('commentId IN (:...commentIds)', { commentIds })
+                      .getRawMany()
+              ).map((v) => v.commentId)
+            : [];
+    }
+
+    async getUserReceivedLikeCount(userId: number): Promise<number> {
+        return PostLikeEntity.createQueryBuilder('post_like')
+            .leftJoinAndSelect('post_like.post', 'post')
+            .where('post.userId = :userId', { userId })
+            .getCount();
     }
 }

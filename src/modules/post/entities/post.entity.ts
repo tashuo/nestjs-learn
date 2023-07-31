@@ -1,5 +1,6 @@
 import { UserEntity } from '../../user/entities/user.entity';
 import {
+    AfterLoad,
     BaseEntity,
     Column,
     CreateDateColumn,
@@ -19,6 +20,7 @@ import { Tag as TagEntity } from '../../tag/entities/tag.entity';
 import { Exclude, Expose, Type } from 'class-transformer';
 import { Category } from './category.entity';
 import { PostToCategory } from './postToCategory.entity';
+import { convertToFriendlyTime, getLocalFileDomain } from '../../../utils/helper';
 
 export enum ContentType {
     HTML = 'html',
@@ -51,6 +53,13 @@ export class PostEntity extends BaseEntity {
 
     @Column()
     content: string;
+
+    @Exclude()
+    @Column({ default: '', comment: '图片路径,多个逗号分隔' })
+    image_paths: string;
+
+    @Expose()
+    image_urls: string[];
 
     /**
      * 文章类型
@@ -97,6 +106,9 @@ export class PostEntity extends BaseEntity {
     @CreateDateColumn()
     created_at: Date;
 
+    @Expose()
+    created_at_friendly: string;
+
     @Exclude()
     @UpdateDateColumn()
     updated_at: Date;
@@ -117,6 +129,14 @@ export class PostEntity extends BaseEntity {
 
     @OneToMany(() => PostToCategory, (postToCategory) => postToCategory.post)
     postToCategories: PostToCategory[];
+
+    @AfterLoad()
+    formatDateAndUrl() {
+        this.created_at_friendly = convertToFriendlyTime(this.created_at);
+        this.image_urls = this.image_paths
+            ? this.image_paths.split(',').map((v) => `${getLocalFileDomain()}${v}`)
+            : [];
+    }
 }
 
 export class PostInfo extends PostEntity {

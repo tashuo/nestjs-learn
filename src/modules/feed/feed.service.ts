@@ -3,13 +3,18 @@ import { isNil } from 'lodash';
 import { FollowService } from '../user/follow.service';
 import { FeedEntity } from './entities/feed.entity';
 import { PostEntity } from '../post/entities/post.entity';
+import { PostService } from '../post/post.service';
+import { convertToPaginationResponse } from 'src/utils/helper';
 
 /**
  * feed流
  */
 @Injectable()
 export class FeedService {
-    constructor(private readonly followService: FollowService) {}
+    constructor(
+        private readonly followService: FollowService,
+        private readonly postService: PostService,
+    ) {}
 
     /**
      * 关注feeds流
@@ -20,21 +25,28 @@ export class FeedService {
     async getTimelineFeeds(userId: number, page = 1, limit = 10) {
         const feeds = await FeedEntity.createQueryBuilder()
             .where('user_id = :userId', { userId })
-            .select(['post_id'])
             .orderBy('publish_time', 'DESC')
-            .offset((page - 1) * limit)
+            .skip((page - 1) * limit)
             .take(limit)
-            .getRawMany();
-        if (feeds.length === 0) {
+            .getManyAndCount();
+        if (feeds[1] === 0) {
             return [];
         }
-        const postIds = feeds.map((item: any) => {
+        const postIds = feeds[0].map((item: FeedEntity) => {
             return item.post_id;
         });
-        return PostEntity.createQueryBuilder()
-            .where(`id IN(${postIds})`)
-            .orderBy('id', 'DESC')
+        const posts = await PostEntity.createQueryBuilder('post')
+            .leftJoinAndSelect('post.user', 'user')
+            .leftJoinAndSelect('post.tags', 'tags')
+            .where(`post.id IN(${postIds})`)
+            .orderBy('post.id', 'DESC')
             .getMany();
+
+        return convertToPaginationResponse(
+            { page, limit },
+            await this.postService.renderPostInfo(posts, userId),
+            feeds[1],
+        );
     }
 
     /**
@@ -84,7 +96,7 @@ export class FeedService {
             return;
         }
         for (let i = 1; ; i++) {
-            const followers = await this.followService.getFollowers(post.user, i, 500);
+            const followers = await this.followService.getFollowers(post.user.id, i, 500);
             if (followers.length === 0) {
                 break;
             }

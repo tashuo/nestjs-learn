@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { User } from 'test/types';
 import * as request from 'supertest';
 import { CollectEntity } from 'src/modules/collect/entities/collect.entity';
-import { uniqid } from 'src/utils/tool';
+import { uniqid } from 'src/utils/helper';
 
 export class CollectTool {
     static info = async (app: INestApplication, loginUser: User, collectId: number) => {

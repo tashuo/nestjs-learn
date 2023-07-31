@@ -12,6 +12,7 @@ specifiers:
   '@nestjs/platform-express': ^9.4.0
   '@nestjs/platform-socket.io': ^9.4.0
   '@nestjs/schematics': ^9.1.0
+  '@nestjs/serve-static': ^4.0.0
   '@nestjs/swagger': ^6.3.0
   '@nestjs/testing': ^9.4.0
   '@nestjs/typeorm': ^9.0.1
@@ -19,7 +20,9 @@ specifiers:
   '@types/bcrypt': ^5.0.0
   '@types/bull': ^4.10.0
   '@types/express': ^4.17.17
+  '@types/fs-extra': ^11.0.1
   '@types/jest': 29.5.1
+  '@types/multer': ^1.4.7
   '@types/node': ^18.16.1
   '@types/passport-jwt': ^3.0.8
   '@types/passport-local': ^1.0.35
@@ -34,6 +37,7 @@ specifiers:
   eslint: ^8.39.0
   eslint-config-prettier: ^8.8.0
   eslint-plugin-prettier: ^4.2.1
+  fs-extra: ^11.1.1
   jest: 29.5.0
   lodash: ^4.17.21
   mysql2: ^3.2.4
@@ -72,6 +76,7 @@ dependencies:
   '@nestjs/passport': 9.0.3_swdehgqxw2nt4jhhnqbb6yp354
   '@nestjs/platform-express': 9.4.3_vw2vky2jc6gkm6gj7lzrgmojyi
   '@nestjs/platform-socket.io': 9.4.3_l7zxfipyb5lbdrfn3feq2rlyme
+  '@nestjs/serve-static': 4.0.0_vw2vky2jc6gkm6gj7lzrgmojyi
   '@nestjs/swagger': 6.3.0_ff6xh7k6m3kcxhzayktinvhdx4
   '@nestjs/typeorm': 9.0.1_nktyjm3hkn2boz7s6l2p266t2u
   '@nestjs/websockets': 9.4.3_t3e4efw2flansfafq6zzjkyohi
@@ -79,6 +84,7 @@ dependencies:
   bull: 4.10.4
   class-transformer: 0.5.1
   class-validator: 0.14.0
+  fs-extra: 11.1.1
   lodash: 4.17.21
   mysql2: 3.4.3
   nest-commands: 3.0.0_ltwa3zncmiphytdfldq44fcnqq
@@ -105,7 +111,9 @@ devDependencies:
   '@types/bcrypt': 5.0.0
   '@types/bull': 4.10.0
   '@types/express': 4.17.17
+  '@types/fs-extra': 11.0.1
   '@types/jest': 29.5.1
+  '@types/multer': 1.4.7
   '@types/node': 18.16.19
   '@types/passport-jwt': 3.0.8
   '@types/passport-local': 1.0.35
@@ -1294,6 +1302,27 @@ packages:
       - chokidar
     dev: true
 
+  /@nestjs/serve-static/4.0.0_vw2vky2jc6gkm6gj7lzrgmojyi:
+    resolution: {integrity: sha512-8cTrNV2ngdHIjiLNsXePnw0+KY1ThrZGz/WeyAG5gIvmZNDbnZBOrPoYlKL+MOzlXlQStxR5jKLYmn+nJeoncQ==}
+    peerDependencies:
+      '@fastify/static': ^6.5.0
+      '@nestjs/common': '*'
+      '@nestjs/core': ^9.0.0 || ^10.0.0
+      express: ^4.18.1
+      fastify: ^4.7.0
+    peerDependenciesMeta:
+      '@fastify/static':
+        optional: true
+      express:
+        optional: true
+      fastify:
+        optional: true
+    dependencies:
+      '@nestjs/common': 9.4.3_j3td4gnlgk75ora6o6suo62byy
+      '@nestjs/core': 9.4.3_wont2uokl5ojh4wpoazb43l7y4
+      path-to-regexp: 0.2.5
+    dev: false
+
   /@nestjs/swagger/6.3.0_ff6xh7k6m3kcxhzayktinvhdx4:
     resolution: {integrity: sha512-Gnig189oa1tD+h0BYIfUwhp/wvvmTn6iO3csR2E4rQrDTgCxSxZDlNdfZo3AC+Rmf8u0KX4ZAX1RZN1qXTtC7A==}
     peerDependencies:
@@ -1559,6 +1588,13 @@ packages:
       '@types/serve-static': 1.15.2
     dev: true
 
+  /@types/fs-extra/11.0.1:
+    resolution: {integrity: sha512-MxObHvNl4A69ofaTRU8DFqvgzzv8s9yRtaPPm5gud9HDNvpB3GPQFvNuTWAI59B9huVGV5jXYJwbCsmBsOGYWA==}
+    dependencies:
+      '@types/jsonfile': 6.1.1
+      '@types/node': 18.16.19
+    dev: true
+
   /@types/graceful-fs/4.1.6:
     resolution: {integrity: sha512-Sig0SNORX9fdW+bQuTEovKj3uHcUL6LQKbCrrqb1X7J6/ReAbhCXRAhc+SMejhLELFj2QcyuxmUooZ4bt5ReSw==}
     dependencies:
@@ -1605,6 +1641,12 @@ packages:
     resolution: {integrity: sha512-Hr5Jfhc9eYOQNPYO5WLDq/n4jqijdHNlDXjuAQkkt+mWdQR+XJToOHrsD4cPaMXpn6KO7y2+wM8AZEs8VpBLVA==}
     dev: true
 
+  /@types/jsonfile/6.1.1:
+    resolution: {integrity: sha512-GSgiRCVeapDN+3pqA35IkQwasaCh/0YFH5dEF6S88iDvEn901DjOeH3/QPY+XYP1DFzDZPvIvfeEgk+7br5png==}
+    dependencies:
+      '@types/node': 18.16.19
+    dev: true
+
   /@types/jsonwebtoken/9.0.2:
     resolution: {integrity: sha512-drE6uz7QBKq1fYqqoFKTDRdFCPHd5TCub75BM+D+cMx7NU9hUz7SESLfC2fSCXVFMO5Yj8sOWHuGqPgjc+fz0Q==}
     dependencies:
@@ -1616,6 +1658,12 @@ packages:
 
   /@types/mime/3.0.1:
     resolution: {integrity: sha512-Y4XFY5VJAuw0FgAqPNd6NNoV44jbq9Bz2L7Rh/J6jLTiHBSBJa9fxqQIvkIld4GsoDOcCbvzOUAbLPsSKKg+uA==}
+    dev: true
+
+  /@types/multer/1.4.7:
+    resolution: {integrity: sha512-/SNsDidUFCvqqcWDwxv2feww/yqhNeTRL5CVoL3jU4Goc4kKEL10T7Eye65ZqPNi4HRx8sAEX59pV1aEH7drNA==}
+    dependencies:
+      '@types/express': 4.17.17
     dev: true
 
   /@types/node/16.18.38:
@@ -3417,6 +3465,15 @@ packages:
       universalify: 2.0.0
     dev: true
 
+  /fs-extra/11.1.1:
+    resolution: {integrity: sha512-MGIE4HOvQCeUCzmlHs0vXpih4ysz4wg9qiSAu6cd42lVwPbTM1TjV7RusoyQqMmk/95gdQZX72u+YW+c3eEpFQ==}
+    engines: {node: '>=14.14'}
+    dependencies:
+      graceful-fs: 4.2.11
+      jsonfile: 6.1.0
+      universalify: 2.0.0
+    dev: false
+
   /fs-minipass/2.1.0:
     resolution: {integrity: sha512-V/JgOLFCS+R6Vcq0slCuaeWEdNC3ouDlJMNIsacH2VtALiu9mV4LPrHc5cDl8k5aw6J8jwgWWpiTo5RYhmIzvg==}
     engines: {node: '>= 8'}
@@ -3588,7 +3645,6 @@ packages:
 
   /graceful-fs/4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
-    dev: true
 
   /grapheme-splitter/1.0.4:
     resolution: {integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==}
@@ -4414,7 +4470,6 @@ packages:
       universalify: 2.0.0
     optionalDependencies:
       graceful-fs: 4.2.11
-    dev: true
 
   /jsonwebtoken/9.0.0:
     resolution: {integrity: sha512-tuGfYXxkQGDPnLJ7SibiQgVgeDgfbPq2k2ICcbgqW8WxWLBAxKQM/ZCu/IT8SOSwmaYl4dpTFCW5xZv7YbbWUw==}
@@ -5169,6 +5224,10 @@ packages:
 
   /path-to-regexp/0.1.7:
     resolution: {integrity: sha512-5DFkuoqlv1uYQKxy8omFBeJPQcdoE07Kv2sferDCrAq1ohOU+MSDswDIbnx3YAM60qIOnYa53wBhXW0EbMonrQ==}
+
+  /path-to-regexp/0.2.5:
+    resolution: {integrity: sha512-l6qtdDPIkmAmzEO6egquYDfqQGPMRNGjYtrU13HAXb3YSRrt7HSb1sJY0pKp6o2bAa86tSB6iwaW2JbthPKr7Q==}
+    dev: false
 
   /path-to-regexp/3.2.0:
     resolution: {integrity: sha512-jczvQbCUS7XmS7o+y1aEO9OBVFeZBQ1MDSEqmO7xSoPgOPoowY/SxLpZ6Vh97/8qHZOteiCKb7gkG9gA2ZUxJA==}
@@ -6243,7 +6302,6 @@ packages:
   /universalify/2.0.0:
     resolution: {integrity: sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==}
     engines: {node: '>= 10.0.0'}
-    dev: true
 
   /unpipe/1.0.0:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}

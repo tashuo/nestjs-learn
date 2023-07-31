@@ -11,6 +11,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { BullModule } from '@nestjs/bull';
 // import { ConsoleModule } from 'nestjs-console';
 import { CommandModule } from 'nest-commands';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
     imports: [
@@ -94,6 +95,9 @@ import { CommandModule } from 'nest-commands';
             }),
             global: true,
         },
+        ServeStaticModule.forRoot({
+            rootPath: path.join(__dirname, '..', 'upload'),
+        }),
     ],
 })
 export class BootstrapModule {}

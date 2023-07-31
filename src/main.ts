@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { ConfigService } from 'nestjs-config';
 import { AppModule } from './app.module';
 import { AuthenticatedSocketIoAdapter } from './modules/ws/authenticated.socketio.adapter';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
@@ -12,7 +13,17 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe());
     app.useWebSocketAdapter(new AuthenticatedSocketIoAdapter(app));
     app.enableCors();
+    app.setGlobalPrefix('api');
     // app.init(); // 加上init会触发bull的consumer重复注册bug？
+
+    const swaggerConfig = new DocumentBuilder()
+        .setTitle('Cats example')
+        .setDescription('The cats API description')
+        .setVersion('1.0')
+        .addBearerAuth()
+        .build();
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('doc', app, document);
 
     await app.listen(config.get('app.port'));
 }

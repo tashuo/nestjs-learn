@@ -27,11 +27,11 @@ class LikeEntity extends BaseEntity {
 @Index('uniq_user_post', ['user', 'post'], { unique: true })
 export class PostLikeEntity extends LikeEntity {
     @Expose()
-    @ManyToOne((type) => UserEntity, (user) => user.post_likes)
+    @ManyToOne(() => UserEntity, (user) => user.post_likes)
     user: UserEntity;
 
     @Expose()
-    @ManyToOne((type) => PostEntity, (post) => post.post_likes)
+    @ManyToOne(() => PostEntity, (post) => post.post_likes)
     post: PostEntity;
 }
 

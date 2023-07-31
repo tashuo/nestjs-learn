@@ -1,11 +1,9 @@
-import { ContentType } from '../entities/post.entity';
-import { IsArray, IsNotEmpty, IsOptional, Length } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsOptional, Length } from 'class-validator';
 
 export class CreatePostDto {
-    @ApiProperty()
+    @IsOptional()
     @Length(1, 20)
-    readonly title: string;
+    readonly title?: string;
 
     /**
      * 文章内容
@@ -14,10 +12,14 @@ export class CreatePostDto {
     @Length(2, 10000)
     readonly content: string;
 
-    @IsNotEmpty()
-    readonly content_type: ContentType;
+    /**
+     * 图片路径列表
+     * @example ['/12/a.png','/3/b.jpg']
+     */
+    @IsOptional()
+    readonly images?: string[];
 
     @IsArray()
     @IsOptional()
-    readonly tags: string[];
+    readonly tags?: string[];
 }

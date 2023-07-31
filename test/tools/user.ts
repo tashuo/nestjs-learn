@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import * as bcrypt from 'bcrypt';
 import { UserFollowerEntity } from 'src/modules/user/entities/follow.entity';
 import { FeedEntity } from 'src/modules/feed/entities/feed.entity';
-import { getRandomNumber, uniqid } from 'src/utils/tool';
+import { getRandomNumber, uniqid } from 'src/utils/helper';
 import { FeedConsumer } from 'src/jobs';
 import { FollowEvent } from 'src/modules/user/events/follow.event';
 import { User } from 'test/types';

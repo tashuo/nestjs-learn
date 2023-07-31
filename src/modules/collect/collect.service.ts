@@ -43,4 +43,11 @@ export class CollectService {
     async delete(collect: CollectEntity) {
         collect.remove();
     }
+
+    async getUserReceivedCollectCount(userId: number): Promise<number> {
+        return CollectPostEntity.createQueryBuilder('collect_post')
+            .leftJoinAndSelect('collect_post.post', 'post')
+            .where('post.userId = :userId', { userId })
+            .getCount();
+    }
 }

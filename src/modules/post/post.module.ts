@@ -10,5 +10,6 @@ import { PostListener } from './post.listener';
     imports: [TypeOrmModule.forFeature([PostEntity])],
     controllers: [PostController],
     providers: [PostService, LikeService, PostListener],
+    exports: [LikeService],
 })
 export class PostModule {}

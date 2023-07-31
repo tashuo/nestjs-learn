@@ -18,7 +18,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { AuthUser } from 'src/common/decorators/authUser.decorator';
 import { BaseController } from 'src/common/base/controller.base';
-import { ApiExtraModels } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { PostEntity } from './entities/post.entity';
 import { CommonResponseDto } from './dto/common-response.dto';
 import { Guest } from 'src/common/decorators/guest.decorator';
@@ -31,12 +31,14 @@ import { CollectEntity } from '../collect/entities/collect.entity';
 import { CancelPostCollectDto, PostCollectDto } from './dto/collect.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PostDeletedEvent } from './events/postDeleted.event';
-import { PaginateDto } from 'src/common/base/paginate.dto';
 import { ExtractJwt } from 'passport-jwt';
 import { JwtService } from '@nestjs/jwt';
 import { IAuthUser } from 'src/interfaces/auth';
+import { QueryCollectdPostDto, QueryLikePostDto, QueryPostDto } from './dto/post-query.dto';
 
 @Controller('post')
+@ApiBearerAuth()
+@ApiTags('帖子')
 export class PostController extends BaseController {
     constructor(
         private readonly postService: PostService,
@@ -52,66 +54,34 @@ export class PostController extends BaseController {
     @GenerateSwaggerResponse(PostEntity, 'single')
     @Post()
     async create(
-        @AuthUser() user,
+        @AuthUser() user: IAuthUser,
         @Body() createPostDto: CreatePostDto,
     ): Promise<CustomBaseResponse<PostEntity>> {
-        return this.successResponse(await this.postService.create(createPostDto, user));
+        return this.successResponse(
+            await this.postService.create(
+                createPostDto,
+                await UserEntity.findOneBy({ id: user.userId }),
+            ),
+        );
     }
 
     @GenerateSwaggerResponse(PostEntity, 'page')
     @Guest()
     @Get()
     async findAll(
-        @Query() pageDto: PaginateDto,
+        @Query() pageDto: QueryPostDto,
         @Req() request: any,
     ): Promise<CustomBaseResponse<PostEntity>> {
         const requestToken = ExtractJwt.fromAuthHeaderAsBearerToken()(request) as string;
         const decodeToken = this.jwtService.decode(requestToken);
-        console.log(decodeToken);
         return this.successResponse(
             await this.postService.findAll(
                 (decodeToken as any)?.userId,
                 pageDto.page,
                 pageDto.limit,
+                pageDto.user,
             ),
         );
-    }
-
-    @GenerateSwaggerResponse(PostEntity, 'single')
-    @Guest()
-    @Get(':id')
-    async findOne(@Param('id') id: string): Promise<CommonResponseDto<PostEntity>> {
-        return this.successResponse(await this.postService.findOne(+id));
-    }
-
-    @Patch(':id')
-    async update(
-        @Param('id') id: number,
-        @Body() updatePostDto: UpdatePostDto,
-        @AuthUser() user: IAuthUser,
-    ) {
-        const post = await PostEntity.findOne({ where: { id }, relations: ['user'] });
-        if (isNil(post) || post.user.id !== user.userId) {
-            return this.failedResponse();
-        }
-        return this.postService.update(post, updatePostDto);
-    }
-
-    @Delete(':id')
-    async remove(@Param('id') id: number, @AuthUser() user: IAuthUser) {
-        const post = await PostEntity.findOne({ where: { id }, relations: ['user'] });
-        if (isNil(post) || post.user.id !== user.userId) {
-            return this.failedResponse();
-        }
-        PostEntity.createQueryBuilder().softDelete().where('id = :id', { id }).execute();
-        this.eventEmitter.emit(
-            'post.delete',
-            new PostDeletedEvent({
-                userId: user.userId,
-                postId: post.id,
-            }),
-        );
-        return this.successResponse();
     }
 
     @Post('like')
@@ -158,5 +128,91 @@ export class PostController extends BaseController {
             return this.failedResponse();
         }
         return this.successResponse(await this.postService.cancleCollect(post, collect));
+    }
+
+    @GenerateSwaggerResponse(PostEntity, 'page')
+    @Guest()
+    @Get('likes')
+    async likes(
+        @Query() pageDto: QueryLikePostDto,
+        @Req() request: any,
+    ): Promise<CustomBaseResponse<PostEntity>> {
+        const requestToken = ExtractJwt.fromAuthHeaderAsBearerToken()(request) as string;
+        const decodeToken = this.jwtService.decode(requestToken);
+        return this.successResponse(
+            await this.postService.getLikePosts(
+                pageDto.user,
+                (decodeToken as any)?.userId,
+                pageDto.page,
+                pageDto.limit,
+            ),
+        );
+    }
+
+    @GenerateSwaggerResponse(PostEntity, 'page')
+    @Guest()
+    @Get('collects')
+    async collects(
+        @Query() pageDto: QueryCollectdPostDto,
+        @Req() request: any,
+    ): Promise<CustomBaseResponse<PostEntity>> {
+        const requestToken = ExtractJwt.fromAuthHeaderAsBearerToken()(request) as string;
+        const decodeToken = this.jwtService.decode(requestToken);
+        return this.successResponse(
+            await this.postService.getCollectPosts(
+                pageDto.user,
+                pageDto.collect,
+                (decodeToken as any)?.userId,
+                pageDto.page,
+                pageDto.limit,
+            ),
+        );
+    }
+
+    @Guest()
+    @Get('/all')
+    async getAllPostIds() {
+        return this.successResponse(
+            (await PostEntity.createQueryBuilder().select('id').getRawMany()).map(
+                (v: PostEntity) => v.id,
+            ),
+        );
+    }
+
+    @GenerateSwaggerResponse(PostEntity, 'single')
+    @Guest()
+    @Get(':id')
+    async findOne(@Param('id') id: string): Promise<CommonResponseDto<PostEntity>> {
+        return this.successResponse(await this.postService.findOne(+id));
+    }
+
+    @Patch(':id')
+    async update(
+        @Param('id') id: number,
+        @Body() updatePostDto: UpdatePostDto,
+        @AuthUser() user: IAuthUser,
+    ) {
+        const post = await PostEntity.findOne({ where: { id }, relations: ['user'] });
+        if (isNil(post) || post.user.id !== user.userId) {
+            return this.failedResponse();
+        }
+        return this.postService.update(post, updatePostDto);
+    }
+
+    @Delete(':id')
+    async remove(@Param('id') id: number, @AuthUser() user: IAuthUser) {
+        const post = await PostEntity.findOne({ where: { id }, relations: ['user'] });
+        if (isNil(post) || post.user.id !== user.userId) {
+            return this.failedResponse();
+        }
+        PostEntity.createQueryBuilder().softDelete().where('id = :id', { id }).execute();
+        this.eventEmitter.emit(
+            'post.delete',
+            new PostDeletedEvent({
+                userId: user.userId,
+                postId: post.id,
+            }),
+        );
+        return this.successResponse();
     }
 }

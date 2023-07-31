@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { User } from 'test/types';
 import * as request from 'supertest';
-import { getRandomNumber, uniqid } from 'src/utils/tool';
+import { getRandomNumber, uniqid } from 'src/utils/helper';
 import { FeedConsumer } from 'src/jobs';
 import { FeedService } from 'src/modules/feed/feed.service';
 import { PostPublishedEvent } from 'src/modules/post/events/postPublished.event';
