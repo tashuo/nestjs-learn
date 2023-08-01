@@ -13,6 +13,7 @@ import { CollectModule } from './modules/collect/collect.module';
 import { AuthModule } from './modules/auth/auth.module';
 import * as jobs from './jobs';
 import { GenerateMigrationCommand } from './database/commands/generate.migration.command';
+import { NoticeModule } from './modules/notice/notice.module';
 
 const providers = [];
 providers.push(
@@ -43,6 +44,7 @@ if (process.env.NODE_ENV != 'test') {
         WsModule,
         CollectModule,
         FeedModule,
+        NoticeModule,
     ],
     providers: providers,
 })

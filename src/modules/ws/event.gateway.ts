@@ -20,6 +20,8 @@ import { Observable, of } from 'rxjs';
 import { WsService } from './ws.service';
 import { WsAuthGuard } from 'src/common/guards/ws-auth.guard';
 import { BadRequestTransformationFilter } from './BadRequestTransformation.filter';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ConnectedEvent } from './events/connected.event';
 
 @Injectable()
 @UseFilters(BadRequestTransformationFilter)
@@ -30,9 +32,11 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect, O
         @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
         private readonly jwtService: JwtService,
         private readonly wsService: WsService,
+        private readonly eventEmiter: EventEmitter2,
     ) {}
 
     async afterInit(ws: Server) {
+        console.log('after init');
         this.wsService.setServer(ws);
     }
 
@@ -51,8 +55,13 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect, O
             throw new UnauthorizedException();
         }
 
-        // todo ws用户登录事件
-        // console.log('connect ' + client.user.id);
+        console.log('connect ' + client.user.id);
+        this.eventEmiter.emit(
+            'ws.connected',
+            new ConnectedEvent({
+                userId: client.user.id,
+            }),
+        );
     }
 
     async handleDisconnect(client: SocketWithUserData) {
@@ -62,7 +71,9 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect, O
 
     @SubscribeMessage('heartbeat')
     heartbeat(@ConnectedSocket() client: SocketWithUserData): Observable<WsResponse<number> | any> {
-        console.log('heartbeat');
+        console.log(
+            `heartbeat: ${client.user.id} : ${this.wsService.getUserSocketId(client.user.id)}`,
+        );
         client.user.lastActiveTime = Date.now();
         return of(client.user);
     }

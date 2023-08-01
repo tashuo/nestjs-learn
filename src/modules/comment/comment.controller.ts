@@ -31,12 +31,18 @@ export class CommentController extends BaseController {
 
     @Post()
     async create(@Body() createCommentDto: CreateCommentDto, @AuthUser() user: IAuthUser) {
-        const post = await PostEntity.findOneBy({ id: createCommentDto.post });
+        const post = await PostEntity.findOne({
+            where: { id: createCommentDto.post },
+            relations: ['user'],
+        });
         if (isNil(post)) {
             return this.failedResponse();
         }
         const parent = createCommentDto.parent
-            ? await CommentEntity.findOneBy({ id: createCommentDto.parent })
+            ? await CommentEntity.findOne({
+                  where: { id: createCommentDto.parent },
+                  relations: ['user'],
+              })
             : null;
         const comment = await this.commentService.create(
             await UserEntity.findOneBy({ id: user.userId }),

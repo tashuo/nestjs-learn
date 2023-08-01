@@ -17,14 +17,16 @@ import { CancelCommentLikeEvent } from '../comment/events/cancelCommentLike.even
  */
 @Injectable()
 export class LikeService {
-    constructor(protected readonly eventEmitter: EventEmitter2) {}
+    constructor(protected readonly eventEmitter: EventEmitter2) {
+        console.log('LikeService constructor');
+    }
     /**
      * 点赞
      * @param user 用户
      * @param postId 帖子ID
      */
     async like(user: UserEntity, postId: number): Promise<boolean> {
-        const post = await PostEntity.findOneBy({ id: postId });
+        const post = await PostEntity.findOne({ where: { id: postId }, relations: ['user'] });
         if (isNil(post)) {
             return false;
         }
@@ -43,6 +45,7 @@ export class LikeService {
                 new PostLikeEvent({
                     userId: user.id,
                     postId,
+                    targetUserId: post.user.id,
                 }),
             );
         }
@@ -78,7 +81,10 @@ export class LikeService {
      * @param commentId 帖子ID
      */
     async likeComment(user: UserEntity, commentId: number): Promise<boolean> {
-        const comment = await CommentEntity.findOneBy({ id: commentId });
+        const comment = await CommentEntity.findOne({
+            where: { id: commentId },
+            relations: ['user', 'post'],
+        });
         if (isNil(comment)) {
             return false;
         }
@@ -95,8 +101,10 @@ export class LikeService {
             this.eventEmitter.emit(
                 'comment.like',
                 new CommentLikeEvent({
+                    postId: comment.post.id,
                     userId: user.id,
                     commentId,
+                    targetUserId: comment.user.id,
                 }),
             );
         }

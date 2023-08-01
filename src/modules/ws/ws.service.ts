@@ -14,11 +14,8 @@ export class WsService {
     }
 
     setServer(server: Server) {
+        console.log('set server');
         this.server = server;
-    }
-
-    initUserSocket() {
-        this.userSocket = new Map();
     }
 
     getUserSocketId(userId: number) {
@@ -27,13 +24,20 @@ export class WsService {
 
     addUserSocket(userId: number, client: SocketWithUserData) {
         this.userSocket.set(userId, client.id);
+        console.log(
+            `add socket ${userId} - ${client.id} - ${this.userSocket.size} - ${this.getUserSocketId(
+                userId,
+            )} - ${this.userSocket.has(userId)}`,
+        );
     }
 
     removeUserSocket(userId: number) {
+        console.log(`remove socket ${userId}`);
         this.userSocket.delete(userId);
     }
 
     async pushMessageToUser(toUserId: number, event: string, data: any) {
+        console.log(this.userSocket.size);
         if (!this.userSocket.has(toUserId)) {
             console.log(`${toUserId}不在线`);
             return;

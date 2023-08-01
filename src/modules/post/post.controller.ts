@@ -107,7 +107,7 @@ export class PostController extends BaseController {
         if (isNil(collect) || collect.user.id !== user.userId) {
             return this.failedResponse();
         }
-        const post = await PostEntity.findOneBy({ id: data.post });
+        const post = await PostEntity.findOne({ where: { id: data.post }, relations: ['user'] });
         if (isNil(post)) {
             return this.failedResponse();
         }

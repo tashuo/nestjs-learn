@@ -143,6 +143,8 @@ export class PostService {
                 new PostCollectEvent({
                     postId: post.id,
                     collectId: collect.id,
+                    userId: collect.user.id,
+                    targetUserId: post.user.id,
                 }),
             );
         }

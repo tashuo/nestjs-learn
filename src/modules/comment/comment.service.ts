@@ -47,6 +47,8 @@ export class CommentService {
                 commentId: comment.id,
                 postId: post.id,
                 rootCommentId,
+                userId: user.id,
+                targetUserId: parent ? parent.user.id : post.user.id,
             }),
         );
 
@@ -104,7 +106,7 @@ export class CommentService {
         }
 
         return convertToCursorPaginationResponse(
-            { cursor: rootCommentIds.at(-1) || 0, limit },
+            { cursor: rootCommentIds.length > 0 ? rootCommentIds.at(-1) : 0, limit },
             await this.renderCommentInfo(data, loginUserId),
         );
     }
@@ -127,7 +129,7 @@ export class CommentService {
         cursor > 0 && qb.andWhere('comment.id < :cursor', { cursor });
         const data = await qb.getMany();
         return convertToCursorPaginationResponse(
-            { cursor: data.map((v: CommentEntity) => v.id).at(-1) || 0, limit },
+            { cursor: data.length > 0 ? data.map((v: CommentEntity) => v.id).at(-1) : 0, limit },
             await this.renderCommentInfo(data, loginUserId),
         );
     }
