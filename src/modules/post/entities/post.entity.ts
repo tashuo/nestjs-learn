@@ -48,10 +48,15 @@ export class PostEntity extends BaseEntity {
     @Index()
     user: UserEntity;
 
-    @Column()
+    @Column({
+        default: '',
+    })
     title: string;
 
-    @Column()
+    @Column({
+        default: '',
+        length: 10000,
+    })
     content: string;
 
     @Exclude()
@@ -81,25 +86,25 @@ export class PostEntity extends BaseEntity {
     status: STATUS;
 
     @Type(() => Number)
-    @Column({ comment: '评论数' })
+    @Column({ comment: '评论数', default: 0 })
     @Index()
     comment_count: number;
 
     @Type(() => Number)
-    @Column({ comment: '点赞数' })
+    @Column({ comment: '点赞数', default: 0 })
     @Index()
     like_count: number;
 
     @Type(() => Number)
-    @Column({ comment: '转发数' })
+    @Column({ comment: '转发数', default: 0 })
     repost_count: number;
 
     @Type(() => Number)
-    @Column({ comment: '收藏数' })
+    @Column({ comment: '收藏数', default: 0 })
     collect_count: number;
 
     @Type(() => Number)
-    @Column({ comment: '详情页浏览数' })
+    @Column({ comment: '详情页浏览数', default: 0 })
     @Index()
     detail_count: number;
 
