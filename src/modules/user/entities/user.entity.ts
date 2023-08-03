@@ -73,7 +73,9 @@ export class UserEntity extends BaseEntity {
     description: string;
 
     @Exclude()
-    @Column()
+    @Column({
+        default: '',
+    })
     password: string;
 
     @Exclude()
