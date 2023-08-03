@@ -12,11 +12,11 @@ async function bootstrap() {
     const config = app.get(ConfigService);
     app.useGlobalPipes(new ValidationPipe());
     app.useWebSocketAdapter(new AuthenticatedSocketIoAdapter(app));
-    app.enableCors({
-        origin: ['http://localhost:3000'],
-        allowedHeaders: ['Origin,DNT', 'Content-Type', 'Authorization'],
-        methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-    });
+    // app.enableCors({
+    //     origin: ['http://localhost:3000'],
+    //     allowedHeaders: ['Origin,DNT', 'Content-Type', 'Authorization'],
+    //     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    // });
     app.setGlobalPrefix('api');
     // app.init(); // 加上init会触发bull的consumer重复注册bug？
 
