@@ -6,18 +6,6 @@ networks:
       driver: default
 
 services:
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - mysql
-      - redis
-    ports:
-      - ${APP_PORT}:${APP_PORT}
-    networks:
-      - default
-
   mysql:
     image: mysql/mysql-server:${MYSQL_VERSION}
     container_name: mysql
@@ -46,6 +34,18 @@ services:
     entrypoint: ["redis-server", "/etc/redis.conf"]
     environment:
       TZ: "$TZ"
+    networks:
+      - default
+  
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql
+      - redis
+    ports:
+      - ${APP_PORT}:${APP_PORT}
     networks:
       - default
   
