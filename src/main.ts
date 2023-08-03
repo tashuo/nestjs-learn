@@ -13,7 +13,7 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe());
     app.useWebSocketAdapter(new AuthenticatedSocketIoAdapter(app));
     app.enableCors();
-    app.setGlobalPrefix('api');
+    // app.setGlobalPrefix('api');
     // app.init(); // 加上init会触发bull的consumer重复注册bug？
 
     const swaggerConfig = new DocumentBuilder()
