@@ -26,7 +26,7 @@ import { ConnectedEvent } from './events/connected.event';
 @Injectable()
 @UseFilters(BadRequestTransformationFilter)
 @UseGuards(WsAuthGuard)
-@WebSocketGateway(3002, { cors: true, transports: ['websocket'] })
+@WebSocketGateway(3002, { cors: true, transports: ['polling', 'websocket'] })
 export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     constructor(
         @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
