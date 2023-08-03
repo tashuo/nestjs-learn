@@ -12,7 +12,9 @@ async function bootstrap() {
     const config = app.get(ConfigService);
     app.useGlobalPipes(new ValidationPipe());
     app.useWebSocketAdapter(new AuthenticatedSocketIoAdapter(app));
-    app.enableCors();
+    app.enableCors({
+        origin: ['http://localhost:3000'],
+    });
     app.setGlobalPrefix('api');
     // app.init(); // 加上init会触发bull的consumer重复注册bug？
 
