@@ -6,6 +6,7 @@ import {
     CreateDateColumn,
     DeleteDateColumn,
     Entity,
+    Index,
     JoinTable,
     ManyToMany,
     OneToMany,
@@ -35,6 +36,20 @@ export class UserEntity extends BaseEntity {
 
     @PrimaryGeneratedColumn()
     id: number;
+
+    @Exclude()
+    @Column({
+        default: 0,
+    })
+    @Index()
+    github_id: number;
+
+    @Exclude()
+    @Column({
+        type: 'json',
+        default: null,
+    })
+    github_user: JSON;
 
     @Column({
         unique: true,
@@ -100,7 +115,9 @@ export class UserEntity extends BaseEntity {
     @AfterLoad()
     convertAvatarUrl() {
         return (this.avatar_url = this.avatar_path
-            ? `${getLocalFileDomain()}${this.avatar_path}`
+            ? this.avatar_path.startsWith('http://') || this.avatar_path.startsWith('https://')
+                ? this.avatar_path
+                : `${getLocalFileDomain()}${this.avatar_path}`
             : 'https://mui.com/static/images/avatar/4.jpg');
     }
 }

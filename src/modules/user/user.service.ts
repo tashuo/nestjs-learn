@@ -8,6 +8,14 @@ import { FollowService } from './follow.service';
 import { LikeService } from '../post/like.service';
 import { CollectService } from '../collect/collect.service';
 
+export type GithubUser = {
+    id: number;
+    name: string;
+    login: string;
+    avatar_url: string;
+    bio?: string;
+};
+
 @Injectable()
 export class UserService {
     constructor(
@@ -31,6 +39,23 @@ export class UserService {
         newUser.password = await bcrypt.hash(createDto.password, 10);
         await newUser.save();
         return newUser;
+    }
+
+    async registerAndGetGithubUser(githubUser: GithubUser): Promise<UserEntity> {
+        console.log(githubUser.id);
+        const user = await UserEntity.findOneBy({ github_id: githubUser.id });
+        if (user) {
+            return user;
+        }
+
+        return UserEntity.save({
+            username: githubUser.name,
+            nickname: githubUser.login,
+            github_id: githubUser.id,
+            avatar_path: githubUser.avatar_url,
+            description: githubUser.bio || '',
+            github_user: githubUser as unknown as JSON,
+        });
     }
 
     async login(loginDto: LoginDto) {

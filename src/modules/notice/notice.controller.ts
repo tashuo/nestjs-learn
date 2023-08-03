@@ -25,7 +25,7 @@ export class NoticeController {
     async summary(@AuthUser() user: IAuthUser) {
         return NoticeEntity.createQueryBuilder()
             .where('userId = :userId', { userId: user.userId })
-            .where(`type IN(:...types)`, { types: Object.values(NoticeTypes) })
+            .andWhere(`type IN(:...types)`, { types: Object.values(NoticeTypes) })
             .andWhere('is_read = :is_read', { is_read: false })
             .groupBy('type')
             .select('`type`, COUNT(`id`) AS `c`')

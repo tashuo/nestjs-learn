@@ -30,7 +30,7 @@ export class FeedService {
             .take(limit)
             .getManyAndCount();
         if (feeds[1] === 0) {
-            return [];
+            return convertToPaginationResponse({ page, limit }, [], 0);
         }
         const postIds = feeds[0].map((item: FeedEntity) => {
             return item.post_id;

@@ -30,7 +30,7 @@ import { ExtractJwt } from 'passport-jwt';
 import { JwtService } from '@nestjs/jwt';
 import { IAuthUser } from 'src/interfaces/auth';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { LoginDto } from './dto/login.dto';
+import { GithubLoginDto, LoginDto } from './dto/login.dto';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { uploadClientFile, uploadClientFiles } from 'src/utils/helper';
 
@@ -66,12 +66,18 @@ export class UserController extends BaseController {
         return this.successResponse(await this.authService.login(req.user));
     }
 
+    @Guest()
+    @Post('githubLogin')
+    async githubLogin(@Body() data: GithubLoginDto) {
+        return this.successResponse(await this.authService.githubLogin(data.code));
+    }
+
     @SerializeOptions({
         groups: ['user-detail'],
     })
     @Get('profile')
-    async profile(@Req() req) {
-        return this.successResponse(await this.userService.detail(req.user.id));
+    async profile(@AuthUser() user: IAuthUser) {
+        return this.successResponse(await this.userService.detail(user.userId));
     }
 
     @SerializeOptions({
