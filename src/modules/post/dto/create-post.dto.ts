@@ -2,7 +2,6 @@ import { IsArray, IsOptional, Length } from 'class-validator';
 
 export class CreatePostDto {
     @IsOptional()
-    @Length(1, 20)
     readonly title?: string;
 
     /**
