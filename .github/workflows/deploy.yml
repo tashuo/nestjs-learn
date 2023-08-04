@@ -20,6 +20,7 @@ jobs:
       - name: Install and build
         run: |
           npm i -g pnpm
+          pnpm setup
           pnpm i -g @nestjs/cli
           pnpm i
           pnpm build
