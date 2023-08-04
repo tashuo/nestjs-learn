@@ -16,13 +16,14 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '18'
+      
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
           
       - name: Install and build
         run: |
-          export PNPM_HOME="/root/.local/share/pnpm"
-          export PATH="${PATH}:${PNPM_HOME}"
-          npm i -g pnpm
-          pnpm setup
           pnpm i -g @nestjs/cli
           pnpm i
           pnpm build
