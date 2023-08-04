@@ -50,6 +50,5 @@ jobs:
           port: ${{ secrets.SERVER_SSH_PORT }}
           script: |
             cd /www/nestjs/community/dist
-            echo "${{ vars.ENVS }}" > .env
-            #cp .env.example .env
+            echo "${{ secrets.ENVS }}" > .env
             pm2 restart ./main.js --name community-api
