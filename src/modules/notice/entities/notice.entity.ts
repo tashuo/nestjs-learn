@@ -42,7 +42,7 @@ export class NoticeEntity extends BaseEntity {
     content?: string;
 
     @Exclude()
-    @Column({ comment: '是否已读' })
+    @Column({ comment: '是否已读', default: false })
     is_read: boolean;
 
     @Exclude()
