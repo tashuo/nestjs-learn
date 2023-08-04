@@ -49,5 +49,5 @@ jobs:
           port: ${{ secrets.SERVER_SSH_PORT }}
           script: |
             cd /www/nestjs/community/
-            cp .env.example .env
+            # cp .env.example .env
             pm2 restart ./dist/src/main.js --name community-api
