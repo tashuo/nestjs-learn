@@ -74,7 +74,7 @@ export class CommentEntity extends BaseEntity {
 
     @Exclude()
     @Type(() => Number)
-    @Column({ comment: '点赞数' })
+    @Column({ comment: '点赞数', default: 0 })
     @Index()
     like_count: number;
 
