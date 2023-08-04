@@ -37,7 +37,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_SSH_PORT }}
-          source: "./dist"
+          source: "./dist/"
           target: "/www/nestjs/community"
 
       - name: SSH deploy-prod
