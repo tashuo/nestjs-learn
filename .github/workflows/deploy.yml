@@ -7,6 +7,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: blog
 
     steps:
       - name: Checkout
@@ -34,7 +35,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          password: 'test'
+          # password: 'test'
           port: ${{ secrets.SERVER_SSH_PORT }}
           source: "./dist"
           target: "/www/nestjs/community/"
