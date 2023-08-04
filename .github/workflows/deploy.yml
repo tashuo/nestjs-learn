@@ -19,6 +19,8 @@ jobs:
           
       - name: Install and build
         run: |
+          export PNPM_HOME="/root/.local/share/pnpm"
+          export PATH="${PATH}:${PNPM_HOME}"
           npm i -g pnpm
           pnpm setup
           pnpm i -g @nestjs/cli
