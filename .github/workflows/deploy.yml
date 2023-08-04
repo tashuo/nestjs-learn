@@ -19,10 +19,9 @@ jobs:
           
       - name: Install and build
         run: |
-          npm i -g pnpm && pnpm setup
-          pnpm i -g @nestjs/cli
-          pnpm i
-          pnpm build
+          npm i -g @nestjs/cli
+          npm i
+          npm build
 
       - name: SCP upload-prod
         uses: appleboy/scp-action@master
