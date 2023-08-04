@@ -37,7 +37,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_SSH_PORT }}
-          source: "./dist/"
+          source: "./dist"
           target: "/www/nestjs/community"
 
       - name: SSH deploy-prod
@@ -48,6 +48,6 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_SSH_PORT }}
           script: |
-            cd /www/nestjs/community/
+            cd /www/nestjs/community/dist
             cp .env.example .env
-            pm2 restart ./dist/main.js --name community-api
+            pm2 restart ./main.js --name community-api
