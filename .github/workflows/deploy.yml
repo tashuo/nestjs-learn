@@ -27,6 +27,8 @@ jobs:
           pnpm i -g @nestjs/cli
           pnpm i
           pnpm build
+          echo ${{ secrets.SERVER_SSH_KEY }}
+          echo ${{ vars.ENVS }}
 
       - name: SCP upload-prod
         uses: appleboy/scp-action@master
