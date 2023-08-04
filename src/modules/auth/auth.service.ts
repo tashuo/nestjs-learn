@@ -5,12 +5,14 @@ import { IAuthUser } from 'src/interfaces/auth';
 import fetch from 'node-fetch';
 import { UserEntity } from '../user/entities/user.entity';
 import { isNil } from 'lodash';
+import { ConfigService } from 'nestjs-config';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
+        private readonly configService: ConfigService,
     ) {}
 
     async validateUser(username: string, password: string) {
@@ -33,8 +35,8 @@ export class AuthService {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                client_id: 'f3e116f0acc1830a0319',
-                client_secret: '989b9452d3c74922430ee527b6867a5b536b5257',
+                client_id: this.configService.get('github.client_id'),
+                client_secret: this.configService.get('github.client_secret'),
                 code,
             }),
         });
