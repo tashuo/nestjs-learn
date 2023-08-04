@@ -38,7 +38,7 @@ export class NoticeEntity extends BaseEntity {
     @ManyToOne(() => CommentEntity)
     comment?: CommentEntity;
 
-    @Column({ comment: '内容', length: 1000 })
+    @Column({ comment: '内容', length: 1000, default: '' })
     content?: string;
 
     @Exclude()
