@@ -28,6 +28,7 @@ jobs:
           pnpm i -g @nestjs/cli
           pnpm i
           pnpm build
+          cp -rp node_modules ./dist/
           cp .env.example ./dist/
 
       - name: SCP upload-prod
