@@ -38,7 +38,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_SSH_PORT }}
           source: "./dist"
-          target: "/www/nestjs/community/"
+          target: "/www/nestjs/community"
 
       - name: SSH deploy-prod
         uses: appleboy/ssh-action@master
@@ -49,5 +49,5 @@ jobs:
           port: ${{ secrets.SERVER_SSH_PORT }}
           script: |
             cd /www/nestjs/community/
-            # cp .env.example .env
-            pm2 restart ./dist/src/main.js --name community-api
+            cp .env.example .env
+            pm2 restart ./dist/main.js --name community-api
