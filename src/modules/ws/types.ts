@@ -11,7 +11,7 @@ export interface SocketWithUserData extends Socket {
 export type UserSocket = Map<number, string>;
 
 // 心跳间隔(ms)
-export const HEART_BEAT_INTERVAL = 60000;
+export const HEART_BEAT_INTERVAL = 30000;
 
 // 允许掉线次数
 export const HEART_BEAT_ALLOWABLE_DROPED_TIMES = 1;
