@@ -14,13 +14,15 @@ import { AuthModule } from './modules/auth/auth.module';
 import * as jobs from './jobs';
 import { GenerateMigrationCommand } from './database/commands/generate.migration.command';
 import { NoticeModule } from './modules/notice/notice.module';
+import { RbacGuard } from './common/guards/rbac-auth.guard';
+import { AdminModule } from './modules/admin/admin.module';
 
 const providers = [];
 providers.push(
     ...[
         {
             provide: APP_GUARD,
-            useClass: JwtAuthGuard,
+            useClass: RbacGuard,
         },
         {
             provide: APP_FILTER,
@@ -45,6 +47,7 @@ if (process.env.NODE_ENV != 'test') {
         CollectModule,
         FeedModule,
         NoticeModule,
+        AdminModule,
     ],
     providers: providers,
 })

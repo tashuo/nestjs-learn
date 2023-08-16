@@ -5,7 +5,7 @@ import { ALLOW_GUEST } from '../../constants/app';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-    constructor(private readonly reflector: Reflector) {
+    constructor(protected readonly reflector: Reflector) {
         super();
     }
     async canActivate(context: ExecutionContext) {

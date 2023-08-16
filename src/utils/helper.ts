@@ -5,7 +5,8 @@ import { PaginateDto } from 'src/common/base/paginate.dto';
 import { extname, resolve } from 'path';
 import { join } from 'path';
 import { outputFile } from 'fs-extra';
-import { isNil } from 'lodash';
+import { isNil, unset, omit } from 'lodash';
+import { Request } from 'express';
 
 // uniqid from php
 export const uniqid = (prefix = '', random?: boolean) => {
@@ -134,3 +135,64 @@ export const uploadClientFiles = async (
         files.map(async (v) => await uploadClientFile(userId, v, prefix, useDateAchieve)),
     );
 };
+
+/**
+ * 是否是后台接口
+ * @param path url path
+ */
+export const isRouteAdmin = (path: string): boolean => {
+    return path.startsWith('/admin/');
+};
+
+/**
+ * 接口是否需要rbac权限校验
+ * @param path
+ */
+export const shouldCheckRbacAuth = (request: Request): boolean => {
+    return isRouteAdmin(request.path);
+};
+
+/**
+ * 扁平树回复树形结构
+ * @param trees
+ * @param depth
+ * @param parent
+ */
+export function flatToTree<E extends LiteralObject>(trees: E[], parent: E | null = null): E[] {
+    const data: E[] = [];
+    trees.map((item: E) => {
+        if (item.parent === parent || item.parent?.id === parent) {
+            data.push({
+                ...omit(item, 'parent', 'depth'),
+                children: flatToTree(trees, item.id),
+            } as unknown as E);
+        }
+    });
+    return data;
+}
+
+/**
+ * 属性结构打平
+ * @param trees
+ * @param depth
+ * @param parent
+ */
+export function treeToFlat<E extends LiteralObject>(
+    trees: E[],
+    depth = 0,
+    parent: E | null = null,
+): E[] {
+    const data: Omit<E, 'children'>[] = [];
+    trees.map((item: E) => {
+        (item as any).depth = depth;
+        (item as any).parent = parent;
+        let children = [];
+        if (!isNil(item.children)) {
+            children = item.children;
+            unset(item, 'children');
+        }
+        data.push(item);
+        data.push(...treeToFlat(children, depth + 1, item));
+    });
+    return data as E[];
+}
