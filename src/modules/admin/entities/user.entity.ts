@@ -2,6 +2,7 @@ import { BaseWithDeletedEntity } from '../../../common/base/base.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { AdminRoleUsersEntity } from './role.entity';
 import { Exclude } from 'class-transformer';
+import { AdminMenuEntity } from './menu.entity';
 
 @Entity('admin_users')
 export class AdminUserEntity extends BaseWithDeletedEntity {
@@ -17,6 +18,7 @@ export class AdminUserEntity extends BaseWithDeletedEntity {
     })
     nickname: string;
 
+    @Exclude()
     @Column({
         comment: '密码',
     })
@@ -25,4 +27,6 @@ export class AdminUserEntity extends BaseWithDeletedEntity {
     @Exclude()
     @OneToMany(() => AdminRoleUsersEntity, (roles) => roles.user)
     roles: AdminRoleUsersEntity[];
+
+    menus: AdminMenuEntity[];
 }

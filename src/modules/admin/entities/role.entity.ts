@@ -27,6 +27,10 @@ export class AdminRoleEntity extends BaseEntity {
     @Exclude()
     @OneToMany(() => AdminRolePermissionsEntity, (permissions) => permissions.role)
     permissions: AdminRolePermissionsEntity[];
+
+    @Exclude()
+    @OneToMany(() => AdminRoleMenusEntity, (menus) => menus.role)
+    menus: AdminRoleMenusEntity[];
 }
 
 @Entity('admin_role_users')

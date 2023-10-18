@@ -3,22 +3,18 @@ import { BaseEntity } from '../../../common/base/base.entity';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { AdminRoleMenusEntity } from './role.entity';
 
-@Exclude()
 @Entity('admin_menus')
 export class AdminMenuEntity extends BaseEntity {
-    @Expose()
     @Column({
         comment: '名称',
     })
     name: string;
 
-    @Expose()
     @Column({
-        comment: 'uri',
+        comment: 'path',
     })
-    uri: string;
+    path: string;
 
-    @Expose()
     @Column({
         comment: 'icon',
     })
@@ -36,13 +32,13 @@ export class AdminMenuEntity extends BaseEntity {
     })
     weight: number;
 
-    @Expose()
     @ManyToOne(() => AdminMenuEntity, (parent) => parent.children)
     parent: AdminMenuEntity;
 
     @OneToMany(() => AdminMenuEntity, (children) => children.parent)
     children: AdminMenuEntity;
 
+    @Exclude()
     @OneToMany(() => AdminRoleMenusEntity, (roles) => roles.menu, {
         cascade: true,
     })

@@ -11,6 +11,10 @@ import { isNil, keyBy } from 'lodash';
 import { flatToTree, treeToFlat } from 'src/utils/helper';
 import { CreateMenuDto, UpdateMenuDto } from './dto/menu.dto';
 import { In } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+import { IAuthUser } from 'src/interfaces/auth';
+import { JwtService } from '@nestjs/jwt';
+import { MenuRepository } from './repositories/menu.repository';
 
 interface OrderMenu {
     id: number;
@@ -20,11 +24,37 @@ interface OrderMenu {
 
 @Injectable()
 export class AdminService {
+    constructor(
+        private readonly jwtService: JwtService,
+        private readonly menuRepostory: MenuRepository,
+    ) {}
+
+    async validateUser(username: string, password: string): Promise<AdminUserEntity> {
+        const admin = await AdminUserEntity.findOneBy({ username });
+        if (!isNil(admin) && (await bcrypt.compare(password, admin.password))) {
+            return admin;
+        }
+    }
+
+    async login(admin: AdminUserEntity) {
+        const payload: IAuthUser = { username: admin.username, userId: admin.id };
+        console.log(payload);
+        return {
+            access_token: this.jwtService.sign(payload),
+        };
+    }
+
+    async getProfile(userId: number) {
+        const profile = await AdminUserEntity.findOneBy({ id: userId });
+        profile.menus = await this.getMenus(profile.id);
+        return profile;
+    }
+
     async getMenus(adminUserId: number) {
         const menus = await AdminMenuEntity.find({
             relations: ['parent'],
             order: { weight: 'DESC' },
-            select: ['id', 'name', 'uri', 'icon'],
+            select: ['id', 'path'], // path用于匹配路由，name和icon用以菜单展示可以使用默认值
             where: {
                 roles: {
                     role: {
@@ -38,6 +68,10 @@ export class AdminService {
             },
         });
         return flatToTree<AdminMenuEntity>(menus);
+    }
+
+    async getAllMenus() {
+        return this.menuRepostory.findTrees();
     }
 
     async setMenu(menu: string) {

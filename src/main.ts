@@ -4,6 +4,7 @@ import { ConfigService } from 'nestjs-config';
 import { AppModule } from './app.module';
 import { AuthenticatedSocketIoAdapter } from './modules/ws/authenticated.socketio.adapter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AdminModule } from './modules/admin/admin.module';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
@@ -13,17 +14,28 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe());
     app.useWebSocketAdapter(new AuthenticatedSocketIoAdapter(app));
     app.enableCors();
-    // app.setGlobalPrefix('api');
+    app.setGlobalPrefix('api');
     // app.init(); // 加上init会触发bull的consumer重复注册bug？
 
     const swaggerConfig = new DocumentBuilder()
-        .setTitle('Cats example')
-        .setDescription('The cats API description')
+        .setTitle('api docs')
+        .setDescription('前端接口文档')
         .setVersion('1.0')
         .addBearerAuth()
         .build();
     const document = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('doc', app, document);
+
+    const swaggerConfigAdmin = new DocumentBuilder()
+        .setTitle('admni api docs')
+        .setDescription('后台接口文档')
+        .setVersion('1.0')
+        .addBearerAuth()
+        .build();
+    const adminDocument = SwaggerModule.createDocument(app, swaggerConfigAdmin, {
+        include: [AdminModule],
+    });
+    SwaggerModule.setup('doc-admin', app, adminDocument);
 
     await app.listen(config.get('app.port'));
 }

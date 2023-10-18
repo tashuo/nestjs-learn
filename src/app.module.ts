@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { BootstrapModule } from './bootstrap.module';
 import { HttpExceptionFilter } from './common/filters/http.exception.filter';
-import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { TagModule } from './modules/tag/tag.module';
 import { PostModule } from './modules/post/post.module';
 import { CommentModule } from './modules/comment/comment.module';

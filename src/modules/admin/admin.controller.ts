@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { BaseController } from 'src/common/base/controller.base';
 import { AdminService } from './admin.service';
 import { AuthUser } from 'src/common/decorators/authUser.decorator';
@@ -7,6 +7,9 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreateMenuDto, SetMenusDto, UpdateMenuDto } from './dto/menu.dto';
 import { AdminMenuEntity } from './entities';
 import { isNil } from 'lodash';
+import { AdminAuthGuard } from 'src/common/guards/admin-auth.guard';
+import { LoginDto } from './dto/login.dto';
+import { Guest } from 'src/common/decorators/guest.decorator';
 
 @ApiBearerAuth()
 @ApiTags('管理后台')
@@ -16,19 +19,36 @@ export class AdminController extends BaseController {
         super();
     }
 
+    @Guest()
+    @UseGuards(AdminAuthGuard)
+    @Post('login')
+    async login(@Req() req: any, @Body() _data: LoginDto) {
+        return this.successResponse(await this.service.login(req.user));
+    }
+
+    @Get('profile')
+    async info(@AuthUser() user: IAuthUser) {
+        return this.successResponse(await this.service.getProfile(user.userId));
+    }
+
     @Get('menu')
     async getMenus(@AuthUser() user: IAuthUser) {
-        return this.service.getMenus(user.userId);
+        return this.successResponse(await this.service.getMenus(user.userId));
+    }
+
+    @Get('allMenus')
+    async getAllMenus(@AuthUser() user: IAuthUser) {
+        return this.successResponse(await this.service.getAllMenus());
     }
 
     @Post('menu')
     async createMenu(@Body() createDto: CreateMenuDto) {
-        return this.service.createMenu(createDto);
+        return this.successResponse(await this.service.createMenu(createDto));
     }
 
     @Post('menu/order')
     async setMenu(@Body() menuDto: SetMenusDto) {
-        return this.service.setMenu(menuDto.menus);
+        return this.successResponse(await this.service.setMenu(menuDto.menus));
     }
 
     @Patch('menu/:id')
@@ -43,7 +63,7 @@ export class AdminController extends BaseController {
             };
         }
 
-        return this.service.updateMenu(menu, updateDto);
+        return this.successResponse(await this.service.updateMenu(menu, updateDto));
     }
 
     @Delete('menu/:id')
