@@ -21,12 +21,6 @@ export class AdminMenuEntity extends BaseEntity {
     icon: string;
 
     @Column({
-        comment: '是否展示',
-        default: false,
-    })
-    show: boolean;
-
-    @Column({
         comment: '权重',
         default: 0,
     })

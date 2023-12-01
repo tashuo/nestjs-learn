@@ -1,7 +1,7 @@
 import { isNumber } from 'lodash';
 import { LiteralObject } from '@nestjs/common';
-import { ICustomCursorPaginationData, ICustomPaginationData } from 'src/interfaces/response';
-import { PaginateDto } from 'src/common/base/paginate.dto';
+import { ICustomAntdProPagination, ICustomCursorPaginationData, ICustomPaginationData } from 'src/interfaces/response';
+import { AntdProPaginateDto, PaginateDto } from 'src/common/base/paginate.dto';
 import { extname, resolve } from 'path';
 import { join } from 'path';
 import { outputFile } from 'fs-extra';
@@ -72,6 +72,21 @@ export function convertToCursorPaginationResponse<E extends LiteralObject>(
             limit,
             hasMore: items.length === limit,
         },
+    };
+}
+
+export function convertToAntdProPaginationResponse<E extends LiteralObject>(
+    query: AntdProPaginateDto,
+    data: E[],
+    total: number,
+): ICustomAntdProPagination<E> {
+    return {
+        success: true,
+        data,
+        total,
+        totalPages: total % query.pageSize === 0 ? Math.floor(total / query.pageSize) : Math.floor(total / query.pageSize) + 1,
+        pageSize: query.pageSize,
+        current: query.current,
     };
 }
 

@@ -1,5 +1,5 @@
 import { BaseEntity } from '../../../common/base/base.entity';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { AfterLoad, Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { AdminUserEntity } from './user.entity';
 import { AdminPermissionEntity } from './permission.entity';
 import { AdminMenuEntity } from './menu.entity';
@@ -31,6 +31,16 @@ export class AdminRoleEntity extends BaseEntity {
     @Exclude()
     @OneToMany(() => AdminRoleMenusEntity, (menus) => menus.role)
     menus: AdminRoleMenusEntity[];
+
+    menu_list: AdminMenuEntity[];
+
+    permission_list: AdminPermissionEntity[];
+
+    @AfterLoad()
+    format () {
+        this.menu_list = this.menus.map(v => v.menu)
+        this.permission_list = this.permissions.map(v => v.permission)
+    }
 }
 
 @Entity('admin_role_users')

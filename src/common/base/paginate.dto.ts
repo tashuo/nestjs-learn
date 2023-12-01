@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsNumber, IsOptional, Min } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString, Min, isNumber } from 'class-validator';
 import { toNumber } from 'lodash';
 
 export class PaginateDto {
@@ -22,4 +22,25 @@ export class PaginateDto {
     @Transform(({ value }) => toNumber(value))
     @Min(1, { message: 'must larger than 0' })
     limit?: number = 10;
+}
+
+export class AntdProPaginateDto {
+    @IsNumber()
+    @Transform(({ value }) => toNumber(value))
+    @Min(1, { message: 'must larger than 0' })
+    current: number;
+
+    @IsNumber()
+    @Transform(({ value }) => toNumber(value))
+    @Min(1, { message: 'must larger than 0' })
+    pageSize: number;
+
+    @IsOptional()
+    @IsString()
+    orderBy?: string;
+
+    @IsOptional()
+    @IsBoolean()
+    @Transform(({ value }) => value === 'true')
+    orderByAsc?: boolean = true;
 }

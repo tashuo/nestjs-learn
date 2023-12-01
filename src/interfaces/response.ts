@@ -38,6 +38,15 @@ export interface ICustomPagination {
     total: number;
 }
 
+export interface ICustomAntdProPagination<T> {
+    data: T[],
+    success: boolean,
+    current: number;
+    pageSize: number;
+    totalPages: number;
+    total: number;
+}
+
 export interface ICustomCursorPagination {
     cursor: number;
     limit: number;

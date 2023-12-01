@@ -8,13 +8,18 @@ import {
     AdminUserEntity,
 } from './entities';
 import { isNil, keyBy } from 'lodash';
-import { flatToTree, treeToFlat } from 'src/utils/helper';
-import { CreateMenuDto, UpdateMenuDto } from './dto/menu.dto';
+import { convertToAntdProPaginationResponse, flatToTree, treeToFlat } from 'src/utils/helper';
+import { CreateMenuDto, MenuDto, UpdateMenuDto } from './dto/menu.dto';
 import { In } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { IAuthUser } from 'src/interfaces/auth';
 import { JwtService } from '@nestjs/jwt';
 import { MenuRepository } from './repositories/menu.repository';
+import { UsersDto } from './dto/user.dto';
+import { UserEntity } from '../user/entities/user.entity';
+import { convertToPaginationResponse } from 'src/utils/helper';
+import { PostDto } from './dto/post.dto';
+import { PostEntity } from '../post/entities/post.entity';
 
 interface OrderMenu {
     id: number;
@@ -50,6 +55,54 @@ export class AdminService {
         return profile;
     }
 
+    async getUsers(queryDto: UsersDto) {
+        const current = queryDto.current;
+        const pageSize = queryDto.pageSize;
+        const query = UserEntity.createQueryBuilder();
+        if (queryDto.id) {
+            query.andWhere('id =: id', {id: queryDto.id});
+        }
+        if (queryDto.username) {
+            query.andWhere('username like :username', {username: `%${queryDto.username}%`});
+        }
+        if (queryDto.orderBy) {
+            query.orderBy(queryDto.orderBy, queryDto.orderByAsc ? 'ASC' : 'DESC');
+        }
+        query.take(pageSize).skip((current - 1) * pageSize);
+        const data = await query.getManyAndCount();
+        return convertToAntdProPaginationResponse(
+            { current, pageSize },
+            data[0],
+            data[1],
+        );
+    }
+
+    async getPosts(queryDto: PostDto) {
+        console.log(queryDto);
+        const current = queryDto.current;
+        const pageSize = queryDto.pageSize;
+        const query = PostEntity.createQueryBuilder();
+        if (queryDto.id) {
+            query.andWhere('id =: id', {id: queryDto.id});
+        }
+        if (queryDto.title) {
+            query.andWhere('title like :title', {title: `%${queryDto.title}%`});
+        }
+        if (queryDto.content) {
+            query.andWhere('content like :content', {content: `%${queryDto.content}%`});
+        }
+        if (queryDto.orderBy) {
+            query.orderBy(queryDto.orderBy, queryDto.orderByAsc ? 'ASC' : 'DESC');
+        }
+        query.take(pageSize).skip((current - 1) * pageSize);
+        const data = await query.getManyAndCount();
+        return convertToAntdProPaginationResponse(
+            { current, pageSize },
+            data[0],
+            data[1],
+        );
+    }
+
     async getMenus(adminUserId: number) {
         const menus = await AdminMenuEntity.find({
             relations: ['parent'],
@@ -71,30 +124,39 @@ export class AdminService {
     }
 
     async getAllMenus() {
-        return this.menuRepostory.findTrees();
+        const menus = await AdminMenuEntity.find({
+            relations: ['parent'],
+            order: { weight: 'DESC' },
+        });
+        return flatToTree<AdminMenuEntity>(menus);
     }
 
-    async setMenu(menu: string) {
-        const menusTree = JSON.parse(menu);
-        if (isNil(menusTree) || menusTree.length === 0) {
-            throw new Error('empty menus');
-        }
-        const menus: OrderMenu[] = treeToFlat(menusTree);
-        const indexedMenus: { [key: string]: OrderMenu } = keyBy(menus, 'id');
-        console.log(indexedMenus);
+    async setMenu(orderMenus: MenuDto[]) {
+        console.log(orderMenus);
+        const menus: MenuDto[] = treeToFlat(orderMenus);
+        console.log(menus);
         const originMenus = await AdminMenuEntity.find({ relations: ['parent'] });
-        if (menus.length !== (await originMenus).length) {
+        console.log(menus.length, originMenus.length);
+        if (menus.length !== originMenus.length) {
             throw new Error('invalid menus');
         }
         const indexedOriginMenus = keyBy(originMenus, 'id');
+        console.log(indexedOriginMenus);
         const menuLen = menus.length;
-        originMenus.forEach((v: AdminMenuEntity, index: number) => {
-            const item = indexedMenus[v.id.toString()];
-            if (isNil(item)) {
+        originMenus.forEach((v: AdminMenuEntity) => {
+            let index = -1;
+            menus.forEach((mV, mK) => {
+                if (mV.id === v.id) {
+                    index = mK;
+                    return;
+                }
+            });
+            if (index === -1) {
                 throw new Error(`menu(${v.id}) missed`);
             }
+            console.log(v.id, index, menus[index]);
             v.weight = menuLen - index;
-            v.parent = item.parent ? indexedOriginMenus[item.parent.id] : null;
+            v.parent = menus[index]?.parent ? indexedOriginMenus[menus[index].parent.id] : null;
             v.save();
         });
     }

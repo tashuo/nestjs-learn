@@ -11,7 +11,10 @@ async function bootstrap() {
         logger: ['error', 'warn', 'debug', 'verbose', 'log'],
     });
     const config = app.get(ConfigService);
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(new ValidationPipe({
+        transform: true,
+        // transformOptions: { enableImplicitConversion: true },    // 会将所有非空字符串转换为true
+    }));
     app.useWebSocketAdapter(new AuthenticatedSocketIoAdapter(app));
     app.enableCors();
     app.setGlobalPrefix('api');

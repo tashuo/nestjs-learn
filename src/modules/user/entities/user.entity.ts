@@ -78,7 +78,6 @@ export class UserEntity extends BaseEntity {
     })
     password: string;
 
-    @Exclude()
     @CreateDateColumn()
     created_at: Date;
 
