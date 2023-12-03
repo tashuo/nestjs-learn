@@ -38,8 +38,8 @@ export class AdminRoleEntity extends BaseEntity {
 
     @AfterLoad()
     format () {
-        this.menu_list = this.menus.map(v => v.menu)
-        this.permission_list = this.permissions.map(v => v.permission)
+        this.menu_list = this.menus?.map(v => v.menu)
+        this.permission_list = this.permissions?.map(v => v.permission)
     }
 }
 

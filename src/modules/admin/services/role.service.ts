@@ -1,99 +1,64 @@
 import { Injectable } from "@nestjs/common";
 import { AdminMenuEntity, AdminRoleEntity, AdminRoleMenusEntity } from "../entities";
-import { flatToTree, treeToFlat } from "src/utils/helper";
+import { convertToAntdProPaginationResponse, flatToTree, treeToFlat } from "src/utils/helper";
 import { CreateMenuDto, MenuDto, UpdateMenuDto } from "../dto/menu.dto";
 import { keyBy } from 'lodash';
 import { In } from "typeorm";
+import { AntdProPaginateDto } from "src/common/base/paginate.dto";
+import { CreateRoleDto, UpdateRoleDto } from "../dto/role.dto";
 
 @Injectable()
 export class RoleService {
-    async getRoles() {
-        return AdminRoleEntity.find({relations: ['menus.menu']});
+    async getRoles(queryDto: AntdProPaginateDto) {
+        const current = queryDto.current;
+        const pageSize = queryDto.pageSize;
+        const roles = await AdminRoleEntity.find({relations: ['menus.menu']});
+        return convertToAntdProPaginationResponse(
+            { current, pageSize },
+            roles,
+            roles.length,
+        );
     }
 
-    async getAllMenus() {
-        const menus = await AdminMenuEntity.find({
-            relations: ['parent'],
-            order: { weight: 'DESC' },
-        });
-        return flatToTree<AdminMenuEntity>(menus);
-    }
-
-    async setMenu(orderMenus: MenuDto[]) {
-        console.log(orderMenus);
-        const menus: MenuDto[] = treeToFlat(orderMenus);
-        console.log(menus);
-        const originMenus = await AdminMenuEntity.find({ relations: ['parent'] });
-        console.log(menus.length, originMenus.length);
-        if (menus.length !== originMenus.length) {
-            throw new Error('invalid menus');
-        }
-        const indexedOriginMenus = keyBy(originMenus, 'id');
-        console.log(indexedOriginMenus);
-        const menuLen = menus.length;
-        originMenus.forEach((v: AdminMenuEntity) => {
-            let index = -1;
-            menus.forEach((mV, mK) => {
-                if (mV.id === v.id) {
-                    index = mK;
-                    return;
-                }
-            });
-            if (index === -1) {
-                throw new Error(`menu(${v.id}) missed`);
-            }
-            console.log(v.id, index, menus[index]);
-            v.weight = menuLen - index;
-            v.parent = menus[index]?.parent ? indexedOriginMenus[menus[index].parent.id] : null;
-            v.save();
-        });
-    }
-
-    async createMenu({ parent, roles, ...data }: CreateMenuDto) {
-        const menu = await AdminMenuEntity.save<AdminMenuEntity>({
-            ...data,
-            parent: parent ? await AdminMenuEntity.findOneBy({ id: parent }) : null,
-        });
-        if (roles.length !== 0) {
-            const roleEntities = await AdminRoleEntity.findBy({ id: In(roles) });
+    async createRole(dto: CreateRoleDto) {
+        const role = new AdminRoleEntity;
+        role.slug = dto.slug;
+        role.name = dto.name;
+        await role.save();
+        if (dto.menus?.length > 0) {
             AdminRoleMenusEntity.createQueryBuilder()
                 .insert()
-                .updateEntity(false)
-                .values(
-                    roleEntities.map((role: AdminRoleEntity) => ({
-                        menu,
-                        role,
-                    })),
-                )
-                .execute();
+                .values((await AdminMenuEntity.findBy({id: In(dto.menus)})).map((menu) => ({
+                    menu,
+                    role,
+                    created_at: new Date(),
+                }))).execute();
         }
     }
 
-    async updateMenu(menu: AdminMenuEntity, { parent, roles, ...data }: UpdateMenuDto) {
+    async updateRole(role: AdminRoleEntity, {menus, ...data}: UpdateRoleDto) {
         await AdminRoleMenusEntity.createQueryBuilder('role_menu')
-            .leftJoinAndSelect('role_menu.menu', 'menu')
-            .where('menu.id = :id', { id: menu.id })
+            .leftJoinAndSelect('role_menu.role', 'role')
+            .where('role.id = :id', { id: role.id })
             .delete()
             .execute();
-        if (roles.length !== 0) {
-            const roleEntities = await AdminRoleEntity.findBy({ id: In(roles) });
+        
+        if (menus?.length > 0) {
             AdminRoleMenusEntity.createQueryBuilder()
                 .insert()
                 .updateEntity(false)
                 .values(
-                    roleEntities.map((role: AdminRoleEntity) => ({
+                    (await AdminMenuEntity.findBy({ id: In(menus) })).map((menu: AdminMenuEntity) => ({
                         menu,
                         role,
                     })),
                 )
                 .execute();
         }
-
-        AdminMenuEntity.update(
-            menu.id,
-            Object.assign(data, {
-                parent: parent ? await AdminMenuEntity.findOneBy({ id: parent }) : null,
-            }),
+    
+        AdminRoleEntity.update(
+            role.id,
+            Object.assign(data),
         );
     }
 }
