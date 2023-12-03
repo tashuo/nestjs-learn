@@ -8,7 +8,7 @@ import {
     AdminUserEntity,
 } from './entities';
 import { isNil, keyBy } from 'lodash';
-import { convertToAntdProPaginationResponse, flatToTree, treeToFlat } from 'src/utils/helper';
+import { autoFillMissedParents, convertToAntdProPaginationResponse, flatToTree, treeToFlat } from 'src/utils/helper';
 import { CreateMenuDto, MenuDto, UpdateMenuDto } from './dto/menu.dto';
 import { In } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -107,7 +107,7 @@ export class AdminService {
         const menus = await AdminMenuEntity.find({
             relations: ['parent'],
             order: { weight: 'DESC' },
-            select: ['id', 'path'], // path用于匹配路由，name和icon用以菜单展示可以使用默认值
+            select: ['id', 'path', 'weight'], // path用于匹配路由，name和icon用以菜单展示可以使用默认值
             where: {
                 roles: {
                     role: {
@@ -120,7 +120,8 @@ export class AdminService {
                 },
             },
         });
-        return flatToTree<AdminMenuEntity>(menus);
+        const data = flatToTree<AdminMenuEntity>(autoFillMissedParents(menus));
+        return data;
     }
 
     async getAllMenus() {

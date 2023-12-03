@@ -168,6 +168,34 @@ export const shouldCheckRbacAuth = (request: Request): boolean => {
 };
 
 /**
+ * 填充缺失的父节点，用以兼容flatToTree
+ * @param list
+ */
+export const autoFillMissedParents = <E extends LiteralObject>(list: E[]): E[] => {
+    const parents = [];
+    const node_ids = [];
+    list.forEach((item: E) => {
+        node_ids.push(item.id);
+        if (item.parent) {
+            item.parent.parent = null;
+            parents.push(item.parent);
+        }
+    })
+
+    parents.forEach(v => {
+        if (!node_ids.includes(v.id)) {
+            list.push(v);
+            node_ids.push(v.id);
+        }
+    })
+
+    // resort
+    list.sort((a, b) => b.weight - a.weight);
+
+    return list;
+}
+
+/**
  * 扁平树回复树形结构
  * @param trees
  * @param depth
