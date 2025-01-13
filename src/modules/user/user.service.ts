@@ -49,7 +49,7 @@ export class UserService {
         }
 
         return UserEntity.save({
-            username: githubUser.name,
+            username: githubUser.name ? githubUser.name : githubUser.login,
             nickname: githubUser.login,
             github_id: githubUser.id,
             avatar_path: githubUser.avatar_url,
