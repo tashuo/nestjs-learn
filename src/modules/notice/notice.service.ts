@@ -15,7 +15,8 @@ export class NoticeService {
             .leftJoinAndSelect('notice.operator', 'operator')
             .leftJoinAndSelect('notice.post', 'post')
             .leftJoinAndSelect('notice.comment', 'comment')
-            .where('notice.type = :type', { type: queryDto.type });
+            .where('notice.type = :type', { type: queryDto.type })
+            .orderBy('id', 'DESC');
         if (queryDto.cursor > 0) {
             query.andWhere('notice.id > :cursor', { cursor: queryDto.cursor });
         }
