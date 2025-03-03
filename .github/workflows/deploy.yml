@@ -50,5 +50,5 @@ jobs:
           port: ${{ secrets.SERVER_SSH_PORT_GOFLASH }}
           script: |
             cd /home/ec2-user/dnmp/www/nestjs/community/dist
-            echo "${{ secrets.ENVS }}" > .env
+            echo "${{ secrets.ENVS_GOFLASH }}" > .env
             pm2 restart ./main.js --name community-api
