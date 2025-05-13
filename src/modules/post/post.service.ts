@@ -67,8 +67,8 @@ export class PostService {
 
     async getLikePosts(userId: number, loginUserId?: number, page = 1, limit = 10) {
         const query = PostLikeEntity.createQueryBuilder('like_post')
-            .leftJoinAndSelect('like_post.post', 'post')
-            .leftJoinAndSelect('post.user', 'user')
+            .innerJoinAndSelect('like_post.post', 'post')
+            .innerJoinAndSelect('post.user', 'user')
             .where('like_post.userId = :userId', { userId })
             .orderBy('like_post.id', 'DESC')
             .offset((page - 1) * limit)
